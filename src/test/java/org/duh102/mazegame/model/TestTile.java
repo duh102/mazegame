@@ -1,5 +1,6 @@
 package org.duh102.mazegame.model;
 
+import org.duh102.mazegame.model.creation.ExitDirectionSet;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumSet;
@@ -10,13 +11,13 @@ public class TestTile {
     @Test
     public void testTileConstructor() {
         Tile tile = new Tile(ExitDirection.UP);
-        assertThat(tile.getExits()).containsExactlyInAnyOrder(ExitDirection.UP);
+        assertThat(tile.getExits().getExits()).containsExactlyInAnyOrder(ExitDirection.UP);
 
         tile = new Tile(ExitDirection.UP, ExitDirection.DOWN);
-        assertThat(tile.getExits()).containsExactlyInAnyOrder(ExitDirection.UP, ExitDirection.DOWN);
+        assertThat(tile.getExits().getExits()).containsExactlyInAnyOrder(ExitDirection.UP, ExitDirection.DOWN);
 
-        tile = new Tile(EnumSet.of(ExitDirection.UP, ExitDirection.LEFT, ExitDirection.RIGHT));
-        assertThat(tile.getExits()).containsExactlyInAnyOrder(ExitDirection.UP, ExitDirection.LEFT, ExitDirection.RIGHT);
+        tile = new Tile(new ExitDirectionSet(ExitDirection.UP, ExitDirection.LEFT, ExitDirection.RIGHT));
+        assertThat(tile.getExits().getExits()).containsExactlyInAnyOrder(ExitDirection.UP, ExitDirection.LEFT, ExitDirection.RIGHT);
     }
 
     @Test

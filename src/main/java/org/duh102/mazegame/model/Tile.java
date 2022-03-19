@@ -1,50 +1,42 @@
 package org.duh102.mazegame.model;
 
-import java.util.Arrays;
-import java.util.EnumSet;
+import org.duh102.mazegame.model.creation.ExitDirectionSet;
 
 public class Tile {
-    private EnumSet<ExitDirection> exits;
+    private ExitDirectionSet exits;
     private int variantSeed;
 
-    public Tile(EnumSet<ExitDirection> exits, int variantSeed) {
+    public Tile(ExitDirectionSet exits, int variantSeed) {
         this.exits = exits;
     }
 
-    public Tile(EnumSet<ExitDirection> exits) {
+    public Tile(ExitDirectionSet exits) {
         this(exits, 0);
     }
     public Tile() {
-        this(EnumSet.noneOf(ExitDirection.class));
+        this(new ExitDirectionSet());
     }
     public Tile(ExitDirection exit) {
-        this(EnumSet.of(exit));
+        this(new ExitDirectionSet(exit));
     }
     public Tile(ExitDirection ... exits) {
-        this(EnumSet.copyOf(Arrays.asList(exits)));
+        this(new ExitDirectionSet(exits));
     }
 
     public Tile(Tile toCopy) {
         this(toCopy.getExits(), toCopy.getVariantSeed());
     }
 
-    public EnumSet<ExitDirection> getExits() {
+    public ExitDirectionSet getExits() {
         return exits;
     }
 
     public boolean connects(ExitDirection direction) {
-        if(direction == null) {
-            return false;
-        }
-        return exits.contains(direction.getOpposite());
+        return exits.connects(direction);
     }
 
     public byte getTileIndex() {
-        byte accumulator = 0;
-        for( ExitDirection exit : exits ) {
-            accumulator+=exit.getBitMask();
-        }
-        return accumulator;
+        return getExits().getTileIndex();
     }
 
     public int getVariantSeed() {

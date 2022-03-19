@@ -52,6 +52,15 @@ public class ImmutablePoint2DInt implements Point2DInt {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if(! (obj instanceof Point2DInt) ) {
+            return false;
+        }
+        Point2DInt other = (Point2DInt)obj;
+        return compareTo(other) == 0;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(x, y);
     }
