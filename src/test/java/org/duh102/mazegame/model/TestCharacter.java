@@ -1,5 +1,7 @@
 package org.duh102.mazegame.model;
 
+import org.duh102.mazegame.model.maze.Character;
+import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.util.Point2DInt;
 import org.junit.jupiter.api.Test;
 

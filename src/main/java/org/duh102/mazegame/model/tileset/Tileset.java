@@ -1,12 +1,13 @@
-package org.duh102.mazegame.graphics.tileset;
+package org.duh102.mazegame.model.tileset;
 
-import org.duh102.mazegame.model.Tile;
+import org.duh102.mazegame.model.maze.Tile;
 import org.duh102.mazegame.util.Point2DInt;
 import org.duh102.mazegame.util.Pair;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class Tileset {
+public class Tileset implements Serializable {
     String tileImages;
     String characterImage;
     Point2DInt tileSize;

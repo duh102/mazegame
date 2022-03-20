@@ -1,8 +1,12 @@
-package org.duh102.mazegame.model;
+package org.duh102.mazegame.model.maze;
 
 import org.duh102.mazegame.util.Point2DInt;
 
-public class Maze {
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Maze implements Serializable {
     private Tile[][] tiles;
     private Point2DInt entrance;
     private Point2DInt exit;
@@ -59,12 +63,12 @@ public class Maze {
 
     public boolean canMove(Point2DInt location, ExitDirection moving) {
         Tile tileAt = getTileAt(location);
-        if(tileAt == null || !tileAt.connects(moving)) {
+        if(tileAt == null || !tileAt.canMoveTo(moving)) {
             return false;
         }
         Point2DInt newPos = location.add(moving.getMoveDirection());
         Tile nextTile = getTileAt(newPos);
-        if(nextTile == null || nextTile.connects(moving.getOpposite())) {
+        if(nextTile == null || nextTile.canAcceptFrom(moving.getOpposite())) {
             return false;
         }
         return true;
@@ -75,20 +79,67 @@ public class Maze {
         }
         return tiles[location.getX()][location.getY()];
     }
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+    public Maze setTiles(Tile[][] tiles) {
+        this.tiles = tiles;
+        return this;
+    }
     public Point2DInt getEntrance() {
         return entrance;
+    }
+    public Maze setEntrance(Point2DInt entrance) {
+        this.entrance = entrance;
+        return this;
     }
     public Point2DInt getExit() {
         return exit;
     }
+    public Maze setExit(Point2DInt exit) {
+        this.exit = exit;
+        return this;
+    }
+
     public boolean hasReachedExit(Point2DInt charLoc) {
         return exit.equals(charLoc);
     }
+    public Point2DInt getSize() {
+        int x = tiles.length, y = 0;
+        for(int i = 0; i < tiles.length; i++) {
+            if(tiles[i] != null && y < tiles[i].length) {
+                y = tiles[i].length;
+            }
+        }
+        return Point2DInt.of(x, y);
+    }
 
     public boolean isIn(Point2DInt location) {
+        Point2DInt maxSize = getSize();
         return tiles != null && tiles.length > 0
-                && location.getX()>= 0 && location.getX() < tiles.length
-                && location.getY() >=0 && location.getY() < tiles[0].length
+                && location.getX() >= 0 && location.getX() < maxSize.getX()
+                && location.getY() >= 0 && location.getY() < maxSize.getY()
+                && tiles[location.getX()].length > location.getY()
                 && tiles[location.getX()][location.getY()] != null;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.deepHashCode(tiles), entrance, exit);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(! (obj instanceof Maze)) {
+            return false;
+        }
+        Maze other = (Maze)obj;
+        return Arrays.deepEquals(tiles, other.getTiles()) && Objects.equals(entrance, other.getEntrance()) && Objects.equals(exit, other.getExit());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Maze(Sz %s, Ent %s, Ex %s)", getSize(), getEntrance(), getExit());
     }
 }

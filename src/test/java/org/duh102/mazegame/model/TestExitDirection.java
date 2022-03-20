@@ -3,7 +3,7 @@ package org.duh102.mazegame.model;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.duh102.mazegame.model.ExitDirection.*;
+import static org.duh102.mazegame.model.maze.ExitDirection.*;
 
 public class TestExitDirection {
     @Test

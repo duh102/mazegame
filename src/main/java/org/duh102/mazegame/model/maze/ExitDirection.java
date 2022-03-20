@@ -1,8 +1,10 @@
-package org.duh102.mazegame.model;
+package org.duh102.mazegame.model.maze;
 
 import org.duh102.mazegame.util.Point2DInt;
 
-public enum ExitDirection {
+import java.io.Serializable;
+
+public enum ExitDirection implements Serializable {
     UP(1<<0, Point2DInt.of(0, -1)),
     RIGHT(1<<1, Point2DInt.of(1, 0)),
     DOWN(1<<2, Point2DInt.of(0, 1)),
@@ -38,5 +40,10 @@ public enum ExitDirection {
             default:
                 return LEFT;
         }
+    }
+
+    @Override
+    public String toString() {
+        return name().substring(0,1);
     }
 }

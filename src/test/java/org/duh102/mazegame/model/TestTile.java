@@ -1,9 +1,9 @@
 package org.duh102.mazegame.model;
 
-import org.duh102.mazegame.model.creation.ExitDirectionSet;
+import org.duh102.mazegame.model.maze.ExitDirection;
+import org.duh102.mazegame.model.maze.ExitDirectionSet;
+import org.duh102.mazegame.model.maze.Tile;
 import org.junit.jupiter.api.Test;
-
-import java.util.EnumSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,16 +23,16 @@ public class TestTile {
     @Test
     public void testTileConnects() {
         Tile straightUp = new Tile(ExitDirection.UP, ExitDirection.DOWN);
-        assertThat(straightUp.connects(ExitDirection.UP)).isTrue();
-        assertThat(straightUp.connects(ExitDirection.DOWN)).isTrue();
-        assertThat(straightUp.connects(ExitDirection.LEFT)).isFalse();
-        assertThat(straightUp.connects(ExitDirection.RIGHT)).isFalse();
+        assertThat(straightUp.canAcceptFrom(ExitDirection.UP)).isTrue();
+        assertThat(straightUp.canAcceptFrom(ExitDirection.DOWN)).isTrue();
+        assertThat(straightUp.canAcceptFrom(ExitDirection.LEFT)).isFalse();
+        assertThat(straightUp.canAcceptFrom(ExitDirection.RIGHT)).isFalse();
 
         Tile upLeft = new Tile(ExitDirection.UP, ExitDirection.LEFT);
-        assertThat(upLeft.connects(ExitDirection.UP)).isFalse();
-        assertThat(upLeft.connects(ExitDirection.DOWN)).isTrue();
-        assertThat(upLeft.connects(ExitDirection.LEFT)).isFalse();
-        assertThat(upLeft.connects(ExitDirection.RIGHT)).isTrue();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.UP)).isFalse();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.DOWN)).isTrue();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.LEFT)).isFalse();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.RIGHT)).isTrue();
     }
 
     @Test

@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestPair {
     @Test
     public void testPairConstructor() {
-        Pair<Integer, Integer> pair = new ImmutablePair<>(2, 4);
+        Pair<Integer, Integer> pair = new MutablePair<>(2, 4);
         assertThat(pair.getFirst()).isEqualTo(2);
         assertThat(pair.getSecond()).isEqualTo(4);
     }
