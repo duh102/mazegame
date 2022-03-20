@@ -1,5 +1,7 @@
 package org.duh102.mazegame.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 public class ImmutablePoint2DInt implements Point2DInt {
@@ -24,6 +26,7 @@ public class ImmutablePoint2DInt implements Point2DInt {
     }
 
     @Override
+    @JsonIgnore
     public int getX() {
         return x;
     }
@@ -32,6 +35,7 @@ public class ImmutablePoint2DInt implements Point2DInt {
         return x;
     }
     @Override
+    @JsonIgnore
     public int getY() {
         return y;
     }
