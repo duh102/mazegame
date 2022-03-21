@@ -5,6 +5,8 @@ import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.maze.Tile;
 import org.duh102.mazegame.model.maze.Character;
+import org.duh102.mazegame.model.tileset.TileSet;
+import org.duh102.mazegame.util.Pair;
 import org.duh102.mazegame.util.Point2DInt;
 import org.junit.jupiter.api.Test;
 
@@ -90,7 +92,40 @@ public class TestComplexSerialization {
     }
 
     @Test
-    public void  testTilesetSerialization() {
+    public void  testTileSetSerialization() {
+        String tileFile = "a/file/location";
+        String charFile = "another/file/location";
+        Point2DInt tileSize = Point2DInt.of(16,16);
+        Point2DInt tileStartOffset = Point2DInt.of(0,0);
+        int variants = 4;
+        Pair<Double, Double> characterImageOffset = Pair.of(1.2, 4.5);
 
+        TileSet from = new TileSet(tileFile, charFile, tileSize, tileStartOffset, variants, characterImageOffset);
+        String json = testJson.toJson(from);
+        assertThat(json).isEqualTo("{\n" +
+                "  \"tileImages\": \"a/file/location\",\n" +
+                "  \"characterImage\": \"another/file/location\",\n" +
+                "  \"tileSize\": {\n" +
+                "    \"x\": 16,\n" +
+                "    \"y\": 16\n" +
+                "  },\n" +
+                "  \"tileStartOffset\": {\n" +
+                "    \"x\": 0,\n" +
+                "    \"y\": 0\n" +
+                "  },\n" +
+                "  \"variants\": 4,\n" +
+                "  \"characterImageOffset\": {\n" +
+                "    \"first\": 1.2,\n" +
+                "    \"second\": 4.5\n" +
+                "  }\n" +
+                "}");
+
+        TileSet to = testJson.fromJson(json, TileSet.class);
+        assertThat(to.getTileFile()).isEqualTo(tileFile);
+        assertThat(to.getCharacterFile()).isEqualTo(charFile);
+        assertThat(to.getTileSize()).isEqualTo(tileSize);
+        assertThat(to.getTileStartOffset()).isEqualTo(tileStartOffset);
+        assertThat(to.getVariants()).isEqualTo(variants);
+        assertThat(to.getCharacterImageOffset()).isEqualTo(characterImageOffset);
     }
 }
