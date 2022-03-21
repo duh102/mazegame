@@ -12,32 +12,32 @@ public class GameBoard implements Serializable {
         this.maze = maze;
         character = new Character(maze.getEntrance());
     }
-    public boolean canMove(ExitDirection direction) {
+    public synchronized boolean canMove(ExitDirection direction) {
         return maze.canMove(character.getPosition(), direction);
     }
-    public GameBoard move(ExitDirection direction) throws InvalidMoveException {
+    public synchronized GameBoard move(ExitDirection direction) throws InvalidMoveException {
         if(!canMove(direction)) {
             throw new InvalidMoveException();
         }
         character.move(direction);
         return this;
     }
-    public boolean hasWon() {
+    public synchronized boolean hasWon() {
         return maze.hasReachedExit(character.getPosition());
     }
 
-    public Maze getMaze() {
+    public synchronized Maze getMaze() {
         return maze;
     }
-    public GameBoard setMaze(Maze maze) {
+    public synchronized GameBoard setMaze(Maze maze) {
         this.maze = maze;
         return this;
     }
 
-    public Character getCharacter() {
+    public synchronized Character getCharacter() {
         return character;
     }
-    public GameBoard setCharacter(Character character) {
+    public synchronized GameBoard setCharacter(Character character) {
         this.character = character;
         return this;
     }

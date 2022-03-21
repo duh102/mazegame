@@ -7,17 +7,16 @@ import org.duh102.mazegame.util.Pair;
 import java.io.Serializable;
 import java.util.Random;
 
-public class Tileset implements Serializable {
+public class TileSet implements Serializable {
     String tileImages;
     String characterImage;
     Point2DInt tileSize;
     Point2DInt tileStartOffset;
     int variants;
     Pair<Double, Double> characterImageOffset;
+    // TODO: Make a no-tile image here too; maybe make it part of the tile map? image 17 perhaps
 
-    Random random = new Random();
-
-    public Tileset(String tileImages, String characterImage, Point2DInt tileSize, Point2DInt tileStartOffset, int variants, Pair<Double, Double> characterImageOffset) {
+    public TileSet(String tileImages, String characterImage, Point2DInt tileSize, Point2DInt tileStartOffset, int variants, Pair<Double, Double> characterImageOffset) {
         this.tileImages = tileImages;
         this.characterImage = characterImage;
         this.tileSize = tileSize;
@@ -26,13 +25,6 @@ public class Tileset implements Serializable {
         this.characterImageOffset = characterImageOffset;
     }
 
-    public Pair<Point2DInt, Point2DInt> getTileCoordinatesFor(Tile tile) {
-        random.setSeed(tile.getVariantSeed());
-        int xIndex = tileSize.getX()*tile.getTileIndex();
-        int yIndex = random.nextInt(variants)*tileSize.getY();
-        Point2DInt startCut = tileStartOffset.add(Point2DInt.of(xIndex, yIndex));
-        return Pair.of(startCut, tileSize);
-    }
     public String getTileFile() {
         return tileImages;
     }
@@ -44,5 +36,11 @@ public class Tileset implements Serializable {
     }
     public Point2DInt getTileSize() {
         return tileSize;
+    }
+    public int getVariants() {
+        return variants;
+    }
+    public Point2DInt getTileStartOffset() {
+        return tileStartOffset;
     }
 }

@@ -68,7 +68,7 @@ public class Maze implements Serializable {
         }
         Point2DInt newPos = location.add(moving.getMoveDirection());
         Tile nextTile = getTileAt(newPos);
-        if(nextTile == null || nextTile.canAcceptFrom(moving.getOpposite())) {
+        if(nextTile == null || !nextTile.canAcceptFrom(moving.getOpposite())) {
             return false;
         }
         return true;

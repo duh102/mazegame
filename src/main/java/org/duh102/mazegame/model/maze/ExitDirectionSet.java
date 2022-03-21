@@ -37,7 +37,7 @@ public class ExitDirectionSet implements Serializable {
         if(direction == null) {
             return false;
         }
-        return exits.contains(direction.getOpposite());
+        return exits.contains(direction);
     }
     public boolean canMoveTo(ExitDirection direction) {
         if(direction == null) {

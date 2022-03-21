@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public interface Point2DInt extends Comparable<Point2DInt>, Serializable {
     Point2DInt add(Point2DInt by);
+    Point2DInt sub(Point2DInt by);
     Point2DInt copy();
     int getX();
     int getY();

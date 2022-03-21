@@ -29,10 +29,10 @@ public class TestTile {
         assertThat(straightUp.canAcceptFrom(ExitDirection.RIGHT)).isFalse();
 
         Tile upLeft = new Tile(ExitDirection.UP, ExitDirection.LEFT);
-        assertThat(upLeft.canAcceptFrom(ExitDirection.UP)).isFalse();
-        assertThat(upLeft.canAcceptFrom(ExitDirection.DOWN)).isTrue();
-        assertThat(upLeft.canAcceptFrom(ExitDirection.LEFT)).isFalse();
-        assertThat(upLeft.canAcceptFrom(ExitDirection.RIGHT)).isTrue();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.UP)).isTrue();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.DOWN)).isFalse();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.LEFT)).isTrue();
+        assertThat(upLeft.canAcceptFrom(ExitDirection.RIGHT)).isFalse();
     }
 
     @Test

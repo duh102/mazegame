@@ -88,4 +88,9 @@ public class TestComplexSerialization {
         Maze read = testJson.fromJson(json, Maze.class);
         assertThat(read).isEqualTo(maze);
     }
+
+    @Test
+    public void  testTilesetSerialization() {
+
+    }
 }

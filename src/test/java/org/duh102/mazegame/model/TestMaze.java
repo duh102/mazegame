@@ -79,11 +79,13 @@ public class TestMaze {
 
     @Test
     public void testCanMove() {
-        Maze maze = new Maze(tiles2x2, Point2DInt.of(0,0), Point2DInt.of(1,0));
+        Maze maze = new Maze(sparseTiles, Point2DInt.of(0,0), Point2DInt.of(1,0));
         assertThat(maze.canMove(Point2DInt.of(0,0), ExitDirection.DOWN)).isTrue();
         assertThat(maze.canMove(Point2DInt.of(0,1), ExitDirection.RIGHT)).isTrue();
-        assertThat(maze.canMove(Point2DInt.of(1,1), ExitDirection.UP)).isTrue();
-        assertThat(maze.canMove(Point2DInt.of(1,0), ExitDirection.DOWN)).isTrue();
+        assertThat(maze.canMove(Point2DInt.of(1,1), ExitDirection.RIGHT)).isTrue();
+        assertThat(maze.canMove(Point2DInt.of(2,1), ExitDirection.UP)).isTrue();
+        assertThat(maze.canMove(Point2DInt.of(2,0), ExitDirection.DOWN)).isTrue();
+        assertThat(maze.canMove(Point2DInt.of(2,1), ExitDirection.LEFT)).isTrue();
         assertThat(maze.canMove(Point2DInt.of(1,1), ExitDirection.LEFT)).isTrue();
         assertThat(maze.canMove(Point2DInt.of(0,1), ExitDirection.UP)).isTrue();
 
@@ -92,11 +94,11 @@ public class TestMaze {
         assertThat(maze.canMove(Point2DInt.of(0,0), ExitDirection.RIGHT)).isFalse();
         assertThat(maze.canMove(Point2DInt.of(0,1), ExitDirection.LEFT)).isFalse();
         assertThat(maze.canMove(Point2DInt.of(0,1), ExitDirection.DOWN)).isFalse();
-        assertThat(maze.canMove(Point2DInt.of(1,1), ExitDirection.DOWN)).isFalse();
-        assertThat(maze.canMove(Point2DInt.of(1,1), ExitDirection.RIGHT)).isFalse();
-        assertThat(maze.canMove(Point2DInt.of(1,0), ExitDirection.LEFT)).isFalse();
-        assertThat(maze.canMove(Point2DInt.of(1,0), ExitDirection.UP)).isFalse();
-        assertThat(maze.canMove(Point2DInt.of(1,0), ExitDirection.RIGHT)).isFalse();
+        assertThat(maze.canMove(Point2DInt.of(2,1), ExitDirection.DOWN)).isFalse();
+        assertThat(maze.canMove(Point2DInt.of(2,1), ExitDirection.RIGHT)).isFalse();
+        assertThat(maze.canMove(Point2DInt.of(2,0), ExitDirection.LEFT)).isFalse();
+        assertThat(maze.canMove(Point2DInt.of(2,0), ExitDirection.UP)).isFalse();
+        assertThat(maze.canMove(Point2DInt.of(2,0), ExitDirection.RIGHT)).isFalse();
     }
 
     @Test

@@ -19,6 +19,14 @@ public class MutablePoint2DInt implements Point2DInt {
     }
 
     @Override
+    public Point2DInt sub(Point2DInt by) {
+        if(by == null) {
+            return this;
+        }
+        return Point2DInt.of(getX() - by.getX(), getY() - by.getY());
+    }
+
+    @Override
     public Point2DInt copy() {
         return new MutablePoint2DInt(x, y);
     }
