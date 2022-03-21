@@ -62,7 +62,6 @@ public class MazeControlListener implements KeyListener {
                 mazeDisplay.notifyMoved();
             } catch(InvalidMoveException ime) {
                 // Just don't move then!
-                System.err.printf("Tried to move %s but was not allowed!\n", direction.name());
             }
         }
         return this;

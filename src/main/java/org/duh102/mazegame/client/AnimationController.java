@@ -11,7 +11,7 @@ public class AnimationController {
     private long targetDT;
     private long lastUpdate = -1;
     private Boolean running = false;
-    private double targetMoveSpeed = 100; // in pixels per second
+    private double targetMoveSpeed = 300; // in pixels per second
     private ExecutorService scheduledThreadPool = Executors.newFixedThreadPool(1);
     private MazeDisplay display;
     private MazeControlListener controlListener;
@@ -20,6 +20,7 @@ public class AnimationController {
     public AnimationController(int targetFps) {
         this.targetFps = Math.min(targetFps, MAX_FPS);
         this.targetDT = 1000/targetFps;
+        lastUpdate = System.currentTimeMillis();
     }
     public AnimationController() {
         this(60);
@@ -71,10 +72,7 @@ public class AnimationController {
             return;
         }
         lastUpdate = currentTime;
-        if(lastUpdate == -1) {
-            return;
-        }
-        double pixelsToMove = 1000/(dT+0.0) * (targetMoveSpeed);
+        double pixelsToMove = (dT+0.0)/1000 * (targetMoveSpeed);
         if(controlListener != null) {
             controlListener.notifyMovement();
         }

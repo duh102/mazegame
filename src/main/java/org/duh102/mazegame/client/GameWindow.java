@@ -50,13 +50,9 @@ public class GameWindow extends JFrame {
         setPreferredSize(new Dimension(640, 500));
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-    }
-
     public GameWindow updateImage() {
         gameIcon.setImage(gameDisplay.redraw().getActiveImage());
+        repaint();
         return this;
     }
     public GameWindow setTileMap(TileMap tileMap) {

@@ -51,8 +51,8 @@ public class MazeDisplay {
         Point2DInt charLoc = board.getCharacter().getPosition();
         Maze maze = board.getMaze();
         Point2DInt tileSize = tileMap.getTileset().getTileSize();
-        int xTiles = (int)Math.round((xSize+0.0) / tileSize.getX());
-        int yTiles = (int)Math.round((ySize+0.0) / tileSize.getY());
+        int xTiles = (int)Math.ceil((xSize+0.0) / tileSize.getX());
+        int yTiles = (int)Math.ceil((ySize+0.0) / tileSize.getY());
         int xHalf = xTiles/2;
         int yHalf = yTiles/2;
         xTiles = (xHalf*2)+1;
@@ -65,21 +65,15 @@ public class MazeDisplay {
         for(int x = 0; x < xTiles; x++) {
             for(int y = 0; y < yTiles; y++) {
                 Point2DInt checkLoc = Point2DInt.of(charLoc.getX() - (xHalf-x), charLoc.getY() - (yHalf-y));
-                Point2DInt drawOffset = Point2DInt.of(halfImageWidth+(checkLoc.getX()*tileSize.getX())-halfTileX, halfImageHeight+(checkLoc.getY()*tileSize.getY())-halfTileY);
+                Point2DInt drawOffset = Point2DInt.of(halfImageWidth-((xHalf-x)*tileSize.getX())-halfTileX, halfImageHeight-((yHalf-y)*tileSize.getY())-halfTileY);
                 Tile tileAt = maze.getTileAt(checkLoc);
-                if(tileAt == null)  {
-                    drawWith.clearRect(drawOffset.getX(), drawOffset.getY(), tileSize.getX(), tileSize.getY());
-                    continue;
-                }
-                Image tileImage = tileMap.getTileFor(tileAt).getImage();
+                Image tileImage = tileMap.getTileFor(tileAt, checkLoc.getX(), checkLoc.getY()).getImage();
                 drawWith.drawImage(tileImage, drawOffset.getX(), drawOffset.getY(), null);
             }
         }
         ImageWithOffset character = tileMap.getCharacterImage();
         Point2D.Double offset = character.getOffset();
         drawWith.drawImage(character.getImage(), (int)Math.round(halfImageWidth+incrementalCharPosition.getX()-offset.getX()), (int)Math.round(halfImageHeight+incrementalCharPosition.getY()-offset.getY()), null);
-        // TODO: DEBUG
-        System.err.printf("Updating game window; character at %s\n", incrementalCharPosition.toString());
         return flipActiveImage();
     }
     public MazeDisplay setGameBoard(GameBoard board) {
@@ -87,7 +81,6 @@ public class MazeDisplay {
         charCurr = board.getCharacter().getPosition();
         charPrev = charCurr;
         incrementalCharPosition = new Point2D.Double(0, 0);
-        redraw();
         return this;
     }
     public GameBoard getBoard() {
@@ -95,7 +88,6 @@ public class MazeDisplay {
     }
     public MazeDisplay setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
-        redraw();
         return this;
     }
     public TileMap getTileMap() {
@@ -128,20 +120,24 @@ public class MazeDisplay {
                     || incrementalCharPosition.getY() > 0 && incrementalCharPosition.getY()-pixelsToMove <= 0) {
                 gotThere = true;
             }
-            incrementalCharPosition.setLocation(incrementalCharPosition.getY()+ (diff.getY()*pixelsToMove), incrementalCharPosition.getY());
+            incrementalCharPosition.setLocation(incrementalCharPosition.getX(), incrementalCharPosition.getY()+ (diff.getY()*pixelsToMove));
         }
         if(gotThere) {
             incrementalCharPosition.setLocation(0,0);
             charPrev = charCurr;
-            readyForMovement = true;
+            synchronized (this) {
+                readyForMovement = true;
+            }
         }
-        redraw();
         return this;
     }
     public synchronized MazeDisplay notifyMoved() {
         readyForMovement = false;
         charPrev = charCurr;
         charCurr = board.getCharacter().getPosition();
+        Point2DInt diff = charCurr.sub(charPrev);
+        Point2DInt tileSize = tileMap.getTileset().getTileSize();
+        incrementalCharPosition = new Point2D.Double(-diff.getX()*tileSize.getX(), -diff.getY()*tileSize.getY());
         return this;
     }
     public synchronized boolean readyForMovement() {
@@ -152,7 +148,6 @@ public class MazeDisplay {
         this.ySize = ySize;
         images[0] = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_RGB);
         images[1] = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_RGB);
-        redraw();
         return this;
     }
 }

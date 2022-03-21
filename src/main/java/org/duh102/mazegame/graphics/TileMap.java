@@ -29,9 +29,15 @@ public class TileMap {
         this.tileset = tileset;
     }
 
-    public ImageWithOffset getTileFor(Tile tile) {
-        List<ImageWithOffset> tilesForIndex = tileImages.get(tile.getTileIndex());
-        random.setSeed(tile.getVariantSeed());
+    public ImageWithOffset getTileFor(Tile tile, int x, int y) {
+        byte idx = 0;
+        int seed = (((x+21)*5)<<45) & (((y+33)*7)<<46);
+        if(tile != null) {
+            idx = tile.getTileIndex();
+            seed = tile.getVariantSeed();
+        }
+        random.setSeed(seed);
+        List<ImageWithOffset> tilesForIndex = tileImages.get(idx);
         return tilesForIndex.get(random.nextInt(tilesForIndex.size()));
     }
     public TileSet getTileset() {
