@@ -1,4 +1,5 @@
 {
+  "tileSetName": "Dungeon 2x",
   "tileImages": "dungeon_tileset_2x_2.png",
   "characterImage": "dungeon_character_2x.png",
   "tileSize": {

@@ -1,4 +1,5 @@
 {
+  "tileSetName": "Grass 2x",
   "tileImages": "grass_tileset_2x_3.png",
   "characterImage": "grass_character_2x.png",
   "tileSize": {
@@ -11,7 +12,7 @@
   },
   "variants": 2,
   "characterImageOffset": {
-    "first": 8.0,
-    "second": 8.0
+    "first": 16.0,
+    "second": 20.0
   }
 }

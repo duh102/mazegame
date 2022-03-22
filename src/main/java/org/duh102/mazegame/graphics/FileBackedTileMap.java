@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-public class TileMapImpl implements TileMap {
+public class FileBackedTileMap implements TileMap {
     private ImageWithOffset characterImage;
     private Map<Byte, List<ImageWithOffset>> tileImages;
     private TileSet tileset;
@@ -23,7 +23,7 @@ public class TileMapImpl implements TileMap {
     Random random = new Random();
 
 
-    public TileMapImpl(ImageWithOffset characterImage, Map<Byte, List<ImageWithOffset>> tileImages, TileSet tileset) {
+    public FileBackedTileMap(ImageWithOffset characterImage, Map<Byte, List<ImageWithOffset>> tileImages, TileSet tileset) {
         this.characterImage = characterImage;
         this.tileImages = tileImages;
         this.tileset = tileset;
@@ -61,17 +61,27 @@ public class TileMapImpl implements TileMap {
         public Builder() {
         }
 
-        public Builder loadFromTileset(TileSet tileset) throws IOException, TileSizeException {
+        public Builder loadFromTileSet(TileSet tileset) throws IOException, TileSizeException {
             this.tileset = tileset;
             characterImage = loadAndOffsetCharacter(tileset);
             tileImages = loadAndOffsetTiles(tileset);
             return this;
         }
-        public TileMapImpl build() throws MazeException {
+        public FileBackedTileMap build() throws MazeException {
             if(tileset == null || characterImage == null || tileImages == null) {
-                throw new MazeException();
+                List<String> nulledItems = new ArrayList<>();
+                if(tileset == null) {
+                    nulledItems.add("tileset");
+                }
+                if(characterImage == null) {
+                    nulledItems.add("character image");
+                }
+                if(tileImages == null) {
+                    nulledItems.add("tile images");
+                }
+                throw new MazeException(String.format("Programmer error: %s are null; ensure you provided them to the builder", String.join(", ", nulledItems)));
             }
-            return new TileMapImpl(characterImage, tileImages, tileset);
+            return new FileBackedTileMap(characterImage, tileImages, tileset);
         }
 
         private ImageWithOffset loadAndOffsetCharacter(TileSet tileset) throws IOException {
@@ -93,11 +103,19 @@ public class TileMapImpl implements TileMap {
             Point2DInt tileSize = tileset.getTileSize();
             Point2DInt tileOffset = tileset.getTileStartOffset();
             int variants = tileset.getVariants();
-            if (imageData.getHeight(null) < tileOffset.getY() + (tileSize.getY() * variants)) {
-                throw new TileSizeException();
+            int imageHeight = imageData.getHeight();
+            int imageWidth = imageData.getWidth();
+            int requiredHeight = tileOffset.getY() + (tileSize.getY() * variants);
+            int requiredWidth = tileOffset.getX() + (tileSize.getX() * 16);
+            if (imageHeight < requiredHeight) {
+                throw new TileSizeException(String.format(
+                        "Tile image height %d less than required offset %d + (variants %d * tile height %d) (%d)",
+                        imageHeight, tileOffset.getY(), variants, tileSize.getY(), requiredHeight));
             }
-            if (imageData.getWidth(null) < tileOffset.getX() + (tileSize.getX() * 16)) {
-                throw new TileSizeException();
+            if (imageWidth < requiredWidth) {
+                throw new TileSizeException(String.format(
+                        "Tile image width %d less than required offset %d + (16 * tile width %d) (%d)",
+                        imageWidth, tileOffset.getX(), tileSize.getX(), requiredWidth));
             }
             Map<Byte, List<ImageWithOffset>> tileLookupMap = new HashMap<>();
             for (byte x = 0; x < 16; x++) {

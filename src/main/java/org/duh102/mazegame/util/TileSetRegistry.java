@@ -28,10 +28,11 @@ public class TileSetRegistry {
 
     public TileSetRegistry rescan() {
         discoveredTileSets = new ArrayList<>();
-        List<TileSet> found = scanPath(".");
-        discoveredTileSets.addAll(found);
-        for(String searchPath : searchPaths) {
-            found = scanPath(searchPath);
+        List<String> fullSearchPath = new ArrayList<>();
+        fullSearchPath.add("tilesets");
+        fullSearchPath.addAll(searchPaths);
+        for(String searchPath : fullSearchPath) {
+            List<TileSet> found = scanPath(searchPath);
             discoveredTileSets.addAll(found);
         }
         return this;
@@ -40,6 +41,7 @@ public class TileSetRegistry {
         File searchDirectory = new File(path);
         List<File> foundFiles = new ArrayList<>();
         if(searchDirectory.exists() && searchDirectory.isDirectory()) {
+            System.err.printf("Searching for tilesets in %s\n", searchDirectory.getAbsolutePath());
             File[] subDirs = searchDirectory.listFiles(tileSetContainingFolder);
             if(subDirs == null) {
                 return new ArrayList<>();
@@ -56,6 +58,9 @@ public class TileSetRegistry {
                 try {
                     FileReader reader = new FileReader(tileFile);
                     TileSet tileSet = jsonReader.fromJson(reader, TileSet.class);
+                    String tileDir = tileFile.getParent();
+                    tileSet.setTileFile(new File(tileDir, tileSet.getTileFile()).getPath());
+                    tileSet.setCharacterFile(new File(tileDir, tileSet.getCharacterFile()).getPath());
                     foundTileSets.add(tileSet);
                 } catch (FileNotFoundException | JsonSyntaxException | JsonIOException e) {
                     System.err.printf("Didn't find a valid TileSet in %s\n", tileFile.toString());

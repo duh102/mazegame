@@ -100,7 +100,7 @@ public class TestComplexSerialization {
         int variants = 4;
         Pair<Double, Double> characterImageOffset = Pair.of(1.2, 4.5);
 
-        TileSet from = new TileSet(tileFile, charFile, tileSize, tileStartOffset, variants, characterImageOffset);
+        TileSet from = new TileSet("test", tileFile, charFile, tileSize, tileStartOffset, variants, characterImageOffset);
         String json = testJson.toJson(from);
         assertThat(json).isEqualTo("{\n" +
                 "  \"tileImages\": \"a/file/location\",\n" +
