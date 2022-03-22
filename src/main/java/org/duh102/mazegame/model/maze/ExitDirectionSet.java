@@ -21,9 +21,23 @@ public class ExitDirectionSet implements Serializable {
     public ExitDirectionSet(ExitDirectionSet exits) {
         this(exits.getExits());
     }
+    public ExitDirectionSet(byte dirNibble) {
+        this(translateFromNibble(dirNibble));
+    }
 
     public EnumSet<ExitDirection> getExits() {
         return exits;
+    }
+
+    public static EnumSet<ExitDirection> translateFromNibble(byte dirNibble) {
+        byte exitDirections = (byte)(dirNibble & 0xF);
+        EnumSet<ExitDirection> directions = EnumSet.noneOf(ExitDirection.class);
+        for(ExitDirection ed : ExitDirection.values()) {
+            if((ed.getBitMask() & exitDirections) > 0) {
+                directions.add(ed);
+            }
+        }
+        return directions;
     }
 
     public byte getTileIndex() {

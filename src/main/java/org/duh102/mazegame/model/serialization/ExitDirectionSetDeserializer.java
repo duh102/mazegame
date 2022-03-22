@@ -13,13 +13,6 @@ import java.util.EnumSet;
 public class ExitDirectionSetDeserializer implements JsonDeserializer<ExitDirectionSet> {
     @Override
     public ExitDirectionSet deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        byte exitDirections = (byte)(jsonElement.getAsByte() & 0xF);
-        EnumSet<ExitDirection> directions = EnumSet.noneOf(ExitDirection.class);
-        for(ExitDirection ed : ExitDirection.values()) {
-            if((ed.getBitMask() & exitDirections) > 0) {
-                directions.add(ed);
-            }
-        }
-        return new ExitDirectionSet(directions);
+        return new ExitDirectionSet(jsonElement.getAsByte());
     }
 }

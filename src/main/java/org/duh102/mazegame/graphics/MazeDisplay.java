@@ -50,7 +50,7 @@ public class MazeDisplay {
         }
         Point2DInt charLoc = board.getCharacter().getPosition();
         Maze maze = board.getMaze();
-        Point2DInt tileSize = tileMap.getTileset().getTileSize();
+        Point2DInt tileSize = tileMap.getTileSize();
         int xTiles = (int)Math.ceil((xSize+0.0) / tileSize.getX());
         int yTiles = (int)Math.ceil((ySize+0.0) / tileSize.getY());
         int xHalf = xTiles/2;
@@ -136,7 +136,7 @@ public class MazeDisplay {
         charPrev = charCurr;
         charCurr = board.getCharacter().getPosition();
         Point2DInt diff = charCurr.sub(charPrev);
-        Point2DInt tileSize = tileMap.getTileset().getTileSize();
+        Point2DInt tileSize = tileMap.getTileSize();
         incrementalCharPosition = new Point2D.Double(-diff.getX()*tileSize.getX(), -diff.getY()*tileSize.getY());
         return this;
     }

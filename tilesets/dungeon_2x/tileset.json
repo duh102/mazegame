@@ -1,0 +1,17 @@
+{
+  "tileImages": "dungeon_tileset_2x_2.png",
+  "characterImage": "dungeon_character_2x.png",
+  "tileSize": {
+    "x": 128,
+    "y": 128
+  },
+  "tileStartOffset": {
+    "x": 0,
+    "y": 0
+  },
+  "variants": 2,
+  "characterImageOffset": {
+    "first": 17.0,
+    "second": 30.0
+  }
+}

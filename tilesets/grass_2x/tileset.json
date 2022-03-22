@@ -1,0 +1,17 @@
+{
+  "tileImages": "grass_tileset_2x_3.png",
+  "characterImage": "grass_character_2x.png",
+  "tileSize": {
+    "x": 64,
+    "y": 64
+  },
+  "tileStartOffset": {
+    "x": 0,
+    "y": 0
+  },
+  "variants": 2,
+  "characterImageOffset": {
+    "first": 8.0,
+    "second": 8.0
+  }
+}
