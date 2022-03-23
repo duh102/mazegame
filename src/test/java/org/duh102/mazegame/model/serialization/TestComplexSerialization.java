@@ -117,7 +117,8 @@ public class TestComplexSerialization {
                 "  \"characterImageOffset\": {\n" +
                 "    \"first\": 1.2,\n" +
                 "    \"second\": 4.5\n" +
-                "  }\n" +
+                "  },\n" +
+                "  \"tileSetName\": \"test\"\n" +
                 "}");
 
         TileSet to = testJson.fromJson(json, TileSet.class);

@@ -1,6 +1,6 @@
 package org.duh102.mazegame.model.maze;
 
-import org.duh102.mazegame.model.exception.InvalidMoveException;
+import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
 
 import java.io.Serializable;
 

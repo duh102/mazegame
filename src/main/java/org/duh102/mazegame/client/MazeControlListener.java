@@ -1,7 +1,7 @@
 package org.duh102.mazegame.client;
 
 import org.duh102.mazegame.graphics.MazeDisplay;
-import org.duh102.mazegame.model.exception.InvalidMoveException;
+import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
 import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.GameBoard;
 

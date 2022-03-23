@@ -4,7 +4,7 @@ import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.ExitDirectionSet;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.maze.Tile;
-import org.duh102.mazegame.model.exception.NotInMazeException;
+import org.duh102.mazegame.model.exception.maze.NotInMazeException;
 import org.duh102.mazegame.util.Point2DInt;
 import org.junit.jupiter.api.Test;
 

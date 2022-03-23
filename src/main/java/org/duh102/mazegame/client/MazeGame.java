@@ -2,8 +2,7 @@ package org.duh102.mazegame.client;
 
 import org.duh102.mazegame.graphics.*;
 import org.duh102.mazegame.model.creation.MazeCarver;
-import org.duh102.mazegame.model.exception.MazeException;
-import org.duh102.mazegame.model.exception.TileSizeException;
+import org.duh102.mazegame.model.exception.maze.MazeException;
 import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
