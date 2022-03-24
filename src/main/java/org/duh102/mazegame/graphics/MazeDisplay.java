@@ -4,8 +4,9 @@ import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.maze.Tile;
-import org.duh102.mazegame.util.BeanRegistry;
-import org.duh102.mazegame.util.CachedBeanRetriever;
+import org.duh102.mazegame.util.Provider;
+import org.duh102.mazegame.util.beanreg.BeanRegistry;
+import org.duh102.mazegame.util.beanreg.CachedBeanRetriever;
 import org.duh102.mazegame.util.Point2DInt;
 
 import java.awt.*;
@@ -22,7 +23,7 @@ public class MazeDisplay {
     private boolean readyForMovement = true;
 
     CachedBeanRetriever<GameBoard> board;
-    CachedBeanRetriever<TileMap> tileMap;
+    CachedBeanRetriever<Provider<TileMap>> tileMap;
 
     public MazeDisplay(int xSize, int ySize, BeanRegistry registry) {
         this.xSize = xSize;
@@ -30,7 +31,7 @@ public class MazeDisplay {
         images[0] = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_RGB);
         images[1] = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_RGB);
         board = new CachedBeanRetriever<>(registry, GameBoard.class);
-        tileMap = new CachedBeanRetriever<>(registry, TileMap.class);
+        tileMap = new CachedBeanRetriever<>(registry, (Class<Provider<TileMap>>)(new Provider<TileMap>(new FallbackTileMap())).getClass());
     }
     public MazeDisplay(BeanRegistry registry) {
         this(640, 480, registry);
@@ -48,24 +49,26 @@ public class MazeDisplay {
     }
 
     public synchronized MazeDisplay redraw() {
+        GameBoard gb = null;
+        TileMap tm = null;
         try {
-            board.get();
-            tileMap.get();
+            gb = board.get();
+            tm = tileMap.get().get();
         } catch(NoBeanFoundException nbfe) {
             System.out.printf("Don't have %s\n", board.hasBean()? "tileMap" : "board");
         }
-        if( ! (board.hasBean() && tileMap.hasBean()) ) {
+        if( gb == null || tm == null ) {
             getInactiveImage().getGraphics().clearRect(0, 0, xSize, ySize);
             return flipActiveImage();
         }
         if(charCurr == null) {
-            charCurr = board.get().getCharacter().getPosition();
+            charCurr = gb.getCharacter().getPosition();
             charPrev = charCurr;
             incrementalCharPosition = new Point2D.Double(0, 0);
         }
-        Point2DInt charLoc = board.get().getCharacter().getPosition();
-        Maze maze = board.get().getMaze();
-        Point2DInt tileSize = tileMap.get().getTileSize();
+        Point2DInt charLoc = gb.getCharacter().getPosition();
+        Maze maze = gb.getMaze();
+        Point2DInt tileSize = tm.getTileSize();
         int xTiles = (int)Math.ceil((xSize+0.0) / tileSize.getX());
         int yTiles = (int)Math.ceil((ySize+0.0) / tileSize.getY());
         int xHalf = xTiles/2;
@@ -82,11 +85,11 @@ public class MazeDisplay {
                 Point2DInt checkLoc = Point2DInt.of(charLoc.getX() - (xHalf-x), charLoc.getY() - (yHalf-y));
                 Point2DInt drawOffset = Point2DInt.of(halfImageWidth-((xHalf-x)*tileSize.getX())-halfTileX, halfImageHeight-((yHalf-y)*tileSize.getY())-halfTileY);
                 Tile tileAt = maze.getTileAt(checkLoc);
-                Image tileImage = tileMap.get().getTileFor(tileAt, checkLoc.getX(), checkLoc.getY()).getImage();
+                Image tileImage = tm.getTileFor(tileAt, checkLoc.getX(), checkLoc.getY()).getImage();
                 drawWith.drawImage(tileImage, drawOffset.getX(), drawOffset.getY(), null);
             }
         }
-        ImageWithOffset character = tileMap.get().getCharacterImage();
+        ImageWithOffset character = tm.getCharacterImage();
         Point2D.Double offset = character.getOffset();
         drawWith.drawImage(character.getImage(), (int)Math.round(halfImageWidth+incrementalCharPosition.getX()-offset.getX()), (int)Math.round(halfImageHeight+incrementalCharPosition.getY()-offset.getY()), null);
         return flipActiveImage();
@@ -134,7 +137,7 @@ public class MazeDisplay {
         charPrev = charCurr;
         charCurr = board.get().getCharacter().getPosition();
         Point2DInt diff = charCurr.sub(charPrev);
-        Point2DInt tileSize = tileMap.get().getTileSize();
+        Point2DInt tileSize = tileMap.get().get().getTileSize();
         incrementalCharPosition = new Point2D.Double(-diff.getX()*tileSize.getX(), -diff.getY()*tileSize.getY());
         return this;
     }

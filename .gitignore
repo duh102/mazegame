@@ -44,3 +44,5 @@ target/
 nohup.out
 
 gameconfig.json
+
+/out

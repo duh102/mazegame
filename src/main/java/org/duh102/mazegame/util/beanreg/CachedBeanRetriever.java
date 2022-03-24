@@ -1,4 +1,4 @@
-package org.duh102.mazegame.util;
+package org.duh102.mazegame.util.beanreg;
 
 public class CachedBeanRetriever<T> {
     private BeanRegistry registry;

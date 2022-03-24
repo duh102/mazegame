@@ -7,7 +7,8 @@ import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.tileset.TileSet;
-import org.duh102.mazegame.util.BeanRegistry;
+import org.duh102.mazegame.util.Provider;
+import org.duh102.mazegame.util.beanreg.BeanRegistry;
 import org.duh102.mazegame.util.Config;
 import org.duh102.mazegame.util.Point2DInt;
 import org.duh102.mazegame.util.TileSetRegistry;
@@ -60,7 +61,8 @@ public class MazeGame {
         if(selectedTileMap == null) {
             selectedTileMap = new FallbackTileMap();
         }
-        registry.registerBean(selectedTileMap, "tilemap");
+        Provider<TileMap> tileMapProvider = new Provider<>(selectedTileMap);
+        registry.registerBean(tileMapProvider, "tilemap");
 
         Maze maze = generateDemoMap();
         GameBoard board = new GameBoard(maze);
@@ -70,13 +72,15 @@ public class MazeGame {
         AnimationController ac = new AnimationController(60, registry);
         MazeControlListener mcl = new MazeControlListener(registry);
         MazeResizeComponentListener mrcl = new MazeResizeComponentListener(registry);
+        MazeActionListener mal = new MazeActionListener(registry);
         MazeDisplay display = new MazeDisplay(640, 480, registry);
         registry.registerBean(ac, "animcontroller")
                 .registerBean(mcl, "controllistener")
                 .registerBean(mrcl, "resizelistener")
-                .registerBean(display, "mazedisplay");
+                .registerBean(display, "mazedisplay")
+                .registerBean(mal, "actionlistener");
 
-        GameWindow window = new GameWindow(mcl, mrcl, display, registry);
+        GameWindow window = new GameWindow(mcl, mal, mrcl, display, registry);
         registry.registerBean(window, "window");
         window.updateImage();
         window.packAndShow();

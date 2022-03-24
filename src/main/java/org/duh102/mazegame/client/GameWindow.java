@@ -2,10 +2,11 @@ package org.duh102.mazegame.client;
 
 import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.graphics.MazeResizeComponentListener;
-import org.duh102.mazegame.util.BeanRegistry;
+import org.duh102.mazegame.util.beanreg.BeanRegistry;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -14,7 +15,7 @@ public class GameWindow extends JFrame {
     MazeDisplay gameDisplay;
     ImageIcon gameIcon;
 
-    public GameWindow(KeyListener kl, MazeResizeComponentListener mazeResizeListener, MazeDisplay display, BeanRegistry registry) {
+    public GameWindow(KeyListener kl, ActionListener actionListener, MazeResizeComponentListener mazeResizeListener, MazeDisplay display, BeanRegistry registry) {
         this.registry = registry;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Duh102's MazeGame");
@@ -28,20 +29,28 @@ public class GameWindow extends JFrame {
 
         JMenuItem item = new JMenuItem("Load Maze", KeyEvent.VK_L);
         item.addKeyListener(kl);
+        item.setActionCommand("lm");
+        item.addActionListener(actionListener);
         fileMenu.add(item);
 
         item = new JMenuItem("Load Tileset", KeyEvent.VK_O);
         item.addKeyListener(kl);
+        item.setActionCommand("lt");
+        item.addActionListener(actionListener);
         fileMenu.add(item);
 
         item = new JMenuItem("Set Tileset", KeyEvent.VK_T);
         item.addKeyListener(kl);
+        item.setActionCommand("st");
+        item.addActionListener(actionListener);
         fileMenu.add(item);
 
         fileMenu.addSeparator();
 
         item = new JMenuItem("Quit", KeyEvent.VK_Q);
         item.addKeyListener(kl);
+        item.setActionCommand("q");
+        item.addActionListener(actionListener);
         fileMenu.add(item);
 
         setJMenuBar(menuBar);

@@ -1,5 +1,6 @@
 package org.duh102.mazegame.util;
 
+import org.duh102.mazegame.util.beanreg.BeanRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package org.duh102.mazegame.util;
+package org.duh102.mazegame.util.beanreg;
 
 import org.duh102.mazegame.model.exception.beanregistry.DuplicateBeanRegistrationException;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
@@ -7,9 +7,11 @@ import java.util.*;
 
 public class BeanRegistry {
     Map<Class<?>, Map<String, Object>> beanRegistry;
+    Map<Object, Set<BeanChangeListener>> beanChangeListenerMap;
 
     public BeanRegistry() {
         beanRegistry = new HashMap<>();
+        beanChangeListenerMap = new HashMap<>();
     }
     public synchronized <T> BeanRegistry registerBean(T bean, String name) {
         Class<?> beanClass = bean.getClass();

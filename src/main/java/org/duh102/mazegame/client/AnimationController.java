@@ -2,8 +2,8 @@ package org.duh102.mazegame.client;
 
 import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
-import org.duh102.mazegame.util.BeanRegistry;
-import org.duh102.mazegame.util.CachedBeanRetriever;
+import org.duh102.mazegame.util.beanreg.BeanRegistry;
+import org.duh102.mazegame.util.beanreg.CachedBeanRetriever;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
