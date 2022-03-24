@@ -24,7 +24,7 @@ public class MazeGame {
     public static void main(String args[]) {
         BeanRegistry registry = new BeanRegistry();
         Config config = new Config();
-        File configFile = new File("gameconfig.json");
+        File configFile = new File(MazeGame.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "../gameconfig.json");
         try {
             Config temp = Config.loadFromFile(configFile);
             if(temp != null) {
