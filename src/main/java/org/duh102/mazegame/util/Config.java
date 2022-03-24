@@ -5,9 +5,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import org.duh102.mazegame.model.serialization.MazeCustomizedGSON;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +31,15 @@ public class Config {
             e.printStackTrace();
             return null;
         }
+    }
+    public Config writeToFile(File location) throws IOException {
+        if(location == null) {
+            throw new FileNotFoundException("File was null");
+        }
+        Gson json = MazeCustomizedGSON.getGsonBase().serializeNulls().setPrettyPrinting().create();
+        FileWriter writer = new FileWriter(location);
+        json.toJson(this, writer);
+        return this;
     }
 
     public List<String> getTileSetSearchPaths() {

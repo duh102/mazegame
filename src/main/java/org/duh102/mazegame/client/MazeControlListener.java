@@ -1,18 +1,28 @@
 package org.duh102.mazegame.client;
 
 import org.duh102.mazegame.graphics.MazeDisplay;
+import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
 import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.GameBoard;
+import org.duh102.mazegame.util.BeanRegistry;
+import org.duh102.mazegame.util.CachedBeanRetriever;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Objects;
 
 public class MazeControlListener implements KeyListener {
-    private MazeDisplay mazeDisplay;
-    private GameBoard gameBoard;
+    private BeanRegistry registry;
+    private CachedBeanRetriever<MazeDisplay> mazeDisplay;
+    private CachedBeanRetriever<GameBoard> gameBoard;
     private ExitDirection heldDirection = null;
+
+    public MazeControlListener(BeanRegistry registry) {
+        this.registry = registry;
+        mazeDisplay = new CachedBeanRetriever<>(registry, MazeDisplay.class);
+        gameBoard = new CachedBeanRetriever<>(registry, GameBoard.class);
+    }
 
     @Override
     public void keyTyped(KeyEvent keyEvent) {
@@ -56,10 +66,18 @@ public class MazeControlListener implements KeyListener {
     }
 
     public MazeControlListener notifyMovement(ExitDirection direction) {
-        if(direction != null && mazeDisplay.readyForMovement()) {
+        try {
+            mazeDisplay.get();
+            gameBoard.get();
+        } catch(NoBeanFoundException nbfe) {
+        }
+        if(! (mazeDisplay.hasBean() && gameBoard.hasBean()) ) {
+            return this;
+        }
+        if(direction != null && mazeDisplay.get().readyForMovement()) {
             try {
-                gameBoard.move(direction);
-                mazeDisplay.notifyMoved();
+                gameBoard.get().move(direction);
+                mazeDisplay.get().notifyMoved();
             } catch(InvalidMoveException ime) {
                 // Just don't move then!
             }
@@ -68,16 +86,6 @@ public class MazeControlListener implements KeyListener {
     }
     public MazeControlListener notifyMovement() {
         notifyMovement(heldDirection);
-        return this;
-    }
-
-    public MazeControlListener setMazeDisplay(MazeDisplay mazeDisplay) {
-        this.mazeDisplay = mazeDisplay;
-        return this;
-    }
-
-    public MazeControlListener setGameBoard(GameBoard gameBoard) {
-        this.gameBoard = gameBoard;
         return this;
     }
 }

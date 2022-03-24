@@ -1,36 +1,38 @@
 package org.duh102.mazegame.graphics;
 
 import org.duh102.mazegame.client.GameWindow;
+import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
+import org.duh102.mazegame.util.BeanRegistry;
+import org.duh102.mazegame.util.CachedBeanRetriever;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 public class MazeResizeComponentListener implements ComponentListener {
-    MazeDisplay mazeDisplay = null;
-    GameWindow gameWindow = null;
+    BeanRegistry registry;
+    CachedBeanRetriever<MazeDisplay> mazeDisplay;
+    CachedBeanRetriever<GameWindow> gameWindow;
 
-    public MazeResizeComponentListener() {
-    }
-
-    public MazeResizeComponentListener setMazeDisplay(MazeDisplay mazeDisplay) {
-        this.mazeDisplay = mazeDisplay;
-        return this;
-    }
-
-    public MazeResizeComponentListener setGameWindow(GameWindow toTriggerRedraw) {
-        this.gameWindow = toTriggerRedraw;
-        return this;
+    public MazeResizeComponentListener(BeanRegistry registry) {
+        this.registry = registry;
+        mazeDisplay = new CachedBeanRetriever<>(registry, MazeDisplay.class);
+        gameWindow = new CachedBeanRetriever<>(registry, GameWindow.class);
     }
 
     @Override
     public void componentResized(ComponentEvent componentEvent) {
-        if(mazeDisplay == null || gameWindow == null) {
+        try {
+            mazeDisplay.get();
+            gameWindow.get();
+        } catch(NoBeanFoundException nbfe) {
+        }
+        if( !(mazeDisplay.hasBean() && gameWindow.hasBean()) ) {
             return;
         }
         Component component = componentEvent.getComponent();
-        mazeDisplay.setImageDimensions(component.getWidth(), component.getHeight());
-        gameWindow.updateImage();
+        mazeDisplay.get().setImageDimensions(component.getWidth(), component.getHeight());
+        gameWindow.get().updateImage();
     }
 
     @Override

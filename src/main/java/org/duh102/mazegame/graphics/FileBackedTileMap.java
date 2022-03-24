@@ -32,10 +32,10 @@ public class FileBackedTileMap implements TileMap {
     @Override
     public ImageWithOffset getTileFor(Tile tile, int x, int y) {
         byte idx = 0;
-        int seed = (((x+21)*5)<<45) & (((y+33)*7)<<46);
+        long seed = generateSeedForBlank(x, y);
         if(tile != null) {
             idx = tile.getTileIndex();
-            seed = tile.getVariantSeed();
+            seed = convertVariantToSeed(x, y, tile.getVariantSeed());
         }
         random.setSeed(seed);
         List<ImageWithOffset> tilesForIndex = tileImages.get(idx);
@@ -130,5 +130,24 @@ public class FileBackedTileMap implements TileMap {
             }
             return tileLookupMap;
         }
+    }
+    private long generateSeedForBlank(int x, int y) {
+        long intX;
+        long intY;
+        if(x < 0) {
+            intX = (((x+21)*5)<<45);
+        } else {
+            intX = (((x+45)*3)<<46);
+        }
+        if( y < 0 ) {
+            intY = (((y+33)*7)<<46);
+        } else {
+            intY = (((y-12)*5)<<45);
+        }
+        return intX ^ intY;
+    }
+    private long convertVariantToSeed(int x, int y, int variant) {
+        long intermediate = generateSeedForBlank(x, y);
+        return variant<<46 ^ intermediate;
     }
 }

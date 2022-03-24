@@ -1,6 +1,9 @@
 package org.duh102.mazegame.client;
 
 import org.duh102.mazegame.graphics.MazeDisplay;
+import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
+import org.duh102.mazegame.util.BeanRegistry;
+import org.duh102.mazegame.util.CachedBeanRetriever;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,32 +16,24 @@ public class AnimationController {
     private Boolean running = false;
     private double targetMoveSpeed = 300; // in pixels per second
     private ExecutorService scheduledThreadPool = Executors.newFixedThreadPool(1);
-    private MazeDisplay display;
-    private MazeControlListener controlListener;
-    private GameWindow gameWindow;
 
-    public AnimationController(int targetFps) {
+    private BeanRegistry registry;
+    private CachedBeanRetriever<MazeDisplay> display;
+    private CachedBeanRetriever<MazeControlListener> controlListener;
+    private CachedBeanRetriever<GameWindow> gameWindow;
+
+    public AnimationController(int targetFps, BeanRegistry registry) {
+        this.registry = registry;
+        display = new CachedBeanRetriever<>(registry, MazeDisplay.class);
+        controlListener = new CachedBeanRetriever<>(registry, MazeControlListener.class);
+        gameWindow = new CachedBeanRetriever<>(registry, GameWindow.class);
+
         this.targetFps = Math.min(targetFps, MAX_FPS);
         this.targetDT = 1000/targetFps;
         lastUpdate = System.currentTimeMillis();
     }
-    public AnimationController() {
-        this(60);
-    }
-
-    public AnimationController setMazeDisplay(MazeDisplay mazeDisplay) {
-        this.display = mazeDisplay;
-        return this;
-    }
-
-    public AnimationController setControlListener(MazeControlListener controlListener) {
-        this.controlListener = controlListener;
-        return this;
-    }
-
-    public AnimationController setGameWindow(GameWindow gameWindow) {
-        this.gameWindow = gameWindow;
-        return this;
+    public AnimationController(BeanRegistry registry) {
+        this(60, registry);
     }
 
     public synchronized AnimationController start() {
@@ -73,14 +68,17 @@ public class AnimationController {
         }
         lastUpdate = currentTime;
         double pixelsToMove = (dT+0.0)/1000 * (targetMoveSpeed);
-        if(controlListener != null) {
-            controlListener.notifyMovement();
+        try {
+            controlListener.get().notifyMovement();
+        } catch(NoBeanFoundException nbfe) {
         }
-        if(display != null) {
-            display.setIncrementalMovement(pixelsToMove);
+        try {
+            display.get().setIncrementalMovement(pixelsToMove);
+        } catch(NoBeanFoundException nbfe) {
         }
-        if(gameWindow != null) {
-            gameWindow.updateImage();
+        try {
+            gameWindow.get().updateImage();
+        } catch(NoBeanFoundException nbfe) {
         }
         long updateTime = System.currentTimeMillis();
         long updateDt = updateTime - currentTime;

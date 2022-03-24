@@ -7,6 +7,7 @@ import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.tileset.TileSet;
+import org.duh102.mazegame.util.BeanRegistry;
 import org.duh102.mazegame.util.Config;
 import org.duh102.mazegame.util.Point2DInt;
 import org.duh102.mazegame.util.TileSetRegistry;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 public class MazeGame {
     public static void main(String args[]) {
+        BeanRegistry registry = new BeanRegistry();
         Config config = new Config();
         File configFile = new File("gameconfig.json");
         try {
@@ -28,10 +30,18 @@ public class MazeGame {
                 config = temp;
             }
         } catch (FileNotFoundException e) {
-            System.err.printf("Couldn't find a file at %s\n", configFile.getAbsolutePath());
+            System.err.printf("Couldn't find a config file at %s, generating one\n", configFile.getAbsolutePath());
             e.printStackTrace();
+            try {
+                config.writeToFile(configFile);
+            } catch (IOException ioException) {
+                System.err.printf("Couldn't output a config file to %s\n", configFile.getAbsolutePath());
+                ioException.printStackTrace();
+            }
         }
+        registry.registerBean(config, "config");
         TileSetRegistry tileSetRegistry = new TileSetRegistry(config.getTileSetSearchPaths());
+        registry.registerBean(tileSetRegistry, "tilesetregistry");
         TileMap selectedTileMap = null;
         tileSetRegistry.rescan();
         if(tileSetRegistry.getDiscoveredTileSets().size() > 0) {
@@ -50,30 +60,25 @@ public class MazeGame {
         if(selectedTileMap == null) {
             selectedTileMap = new FallbackTileMap();
         }
-
-
-        AnimationController ac = new AnimationController(60);
-        MazeControlListener mcl = new MazeControlListener();
-        MazeResizeComponentListener mrcl = new MazeResizeComponentListener();
-        MazeDisplay display = new MazeDisplay(640, 480);
+        registry.registerBean(selectedTileMap, "tilemap");
 
         Maze maze = generateDemoMap();
         GameBoard board = new GameBoard(maze);
+        registry.registerBean(board, "gameboard");
 
-        ac.setControlListener(mcl);
-        ac.setMazeDisplay(display);
 
-        mcl.setGameBoard(board);
-        mcl.setMazeDisplay(display);
+        AnimationController ac = new AnimationController(60, registry);
+        MazeControlListener mcl = new MazeControlListener(registry);
+        MazeResizeComponentListener mrcl = new MazeResizeComponentListener(registry);
+        MazeDisplay display = new MazeDisplay(640, 480, registry);
+        registry.registerBean(ac, "animcontroller")
+                .registerBean(mcl, "controllistener")
+                .registerBean(mrcl, "resizelistener")
+                .registerBean(display, "mazedisplay");
 
-        display.setGameBoard(board);
-
-        mrcl.setMazeDisplay(display);
-
-        GameWindow window = new GameWindow(mcl, mrcl, display);
-        mrcl.setGameWindow(window);
-        ac.setGameWindow(window);
-        window.setTileMap(selectedTileMap);
+        GameWindow window = new GameWindow(mcl, mrcl, display, registry);
+        registry.registerBean(window, "window");
+        window.updateImage();
         window.packAndShow();
         ac.start();
     }
@@ -92,6 +97,16 @@ public class MazeGame {
                 .carve(ExitDirection.UP)
                 .carve(ExitDirection.RIGHT)
                 .setExit();
+        carver.repositionKnife(Point2DInt.of(0,3))
+                .carve(ExitDirection.RIGHT)
+                .carve(ExitDirection.RIGHT)
+                .carve(ExitDirection.RIGHT)
+                .carve(ExitDirection.UP)
+                .repositionKnife(Point2DInt.of(2,1))
+                .carve(ExitDirection.LEFT)
+                .carve(ExitDirection.UP)
+                .carve(ExitDirection.RIGHT)
+                .carve(ExitDirection.RIGHT);
         return carver.getMaze();
         } catch(MazeException me) {
             throw new RuntimeException(me);
