@@ -30,28 +30,28 @@ tileset.json needs to have several parameters defined to work:
 Each is relatively self-explanatory, but in detail:
 
 * tileSetName
-** Indicates the name that should be shown on the "Set TileSet" dialog
-** Can be anything, but should be unique, otherwise the program will get confused (should probably fix this tbh)
+  * Indicates the name that should be shown on the "Set TileSet" dialog
+  * Can be anything, but should be unique, otherwise the program will get confused (should probably fix this tbh)
 * tileImages
-** Path, relative to the tileset.json-containing directory, of where the floor tiles image is
+  * Path, relative to the tileset.json-containing directory, of where the floor tiles image is
 * characterImage
-** Path, relative to the tileset.json-containing directory, of where the character image is
+  * Path, relative to the tileset.json-containing directory, of where the character image is
 * tileSize
-** An object describing the width and height of a tile
-** The x property indicates width, in pixels, y indicates height
+  * An object describing the width and height of a tile
+  * The x property indicates width, in pixels, y indicates height
 * tileStartOffset
-** An object describing where in the image the tile slicer should begin
-** This only applies if, in the image, your tiles have been placed at some offset from the top left of the image
-** The x property indicates horizontal offset from the left side of the image, in pixels, y indicates vertical offset from the top of the image
+  * An object describing where in the image the tile slicer should begin
+  * This only applies if, in the image, your tiles have been placed at some offset from the top left of the image
+  * The x property indicates horizontal offset from the left side of the image, in pixels, y indicates vertical offset from the top of the image
 * characterImageOffset
-** An object describing how the character image should be manipulated to place the "foot" of the character in the middle of the spot it moves to
-** You can also think of it as, in pixels from the top and left of the image, the "root" of the image should be
-** The image will be moved this many pixels left and up relative to the center of the tile that the character is on
-** The first property indicates how many pixels left (subpixels accepted), the second property indicates how many pixels up
+  * An object describing how the character image should be manipulated to place the "foot" of the character in the middle of the spot it moves to
+  * You can also think of it as, in pixels from the top and left of the image, the "root" of the image should be
+  * The image will be moved this many pixels left and up relative to the center of the tile that the character is on
+  * The first property indicates how many pixels left (subpixels accepted), the second property indicates how many pixels up
 * variants
-** This property indicates how many variants of your tiles you have included in the tileset
-** Variants are read vertically, tile directions are read horizontally
-** See the "Creating a Tile Set Image" section for detailed instructions
+  * This property indicates how many variants of your tiles you have included in the tileset
+  * Variants are read vertically, tile directions are read horizontally
+  * See the "Creating a Tile Set Image" section for detailed instructions
 
 Here is an example
 ```
