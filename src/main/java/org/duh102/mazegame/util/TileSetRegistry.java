@@ -15,10 +15,11 @@ import java.util.List;
 
 public class TileSetRegistry {
     private List<TileSet> discoveredTileSets = null;
+    private File rootFolder;
     private List<String> searchPaths;
 
-    public TileSetRegistry(List<String> searchPaths) {
-        this.searchPaths = searchPaths;
+    public TileSetRegistry(File rootFolder) {
+        this.rootFolder = rootFolder;
     }
 
     public TileSetRegistry setSearchPaths(List<String> searchPaths) {
@@ -28,17 +29,25 @@ public class TileSetRegistry {
 
     public TileSetRegistry rescan() {
         discoveredTileSets = new ArrayList<>();
-        List<String> fullSearchPath = new ArrayList<>();
-        fullSearchPath.add("tilesets");
-        fullSearchPath.addAll(searchPaths);
-        for(String searchPath : fullSearchPath) {
+        List<File> fullSearchPath = new ArrayList<>();
+        fullSearchPath.add(new File(rootFolder, "tilesets"));
+        if(searchPaths != null) {
+            for(String path : searchPaths) {
+                File pathFile = new File(path);
+                if(pathFile.isAbsolute()) {
+                    fullSearchPath.add(pathFile);
+                } else {
+                    fullSearchPath.add(new File(rootFolder, path));
+                }
+            }
+        }
+        for(File searchPath : fullSearchPath) {
             List<TileSet> found = scanPath(searchPath);
             discoveredTileSets.addAll(found);
         }
         return this;
     }
-    public List<TileSet> scanPath(String path) {
-        File searchDirectory = new File(path);
+    public List<TileSet> scanPath(File searchDirectory) {
         List<File> foundFiles = new ArrayList<>();
         if(searchDirectory.exists() && searchDirectory.isDirectory()) {
             System.err.printf("Searching for tilesets in %s\n", searchDirectory.getAbsolutePath());

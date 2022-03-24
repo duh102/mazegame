@@ -24,7 +24,8 @@ public class MazeGame {
     public static void main(String args[]) {
         BeanRegistry registry = new BeanRegistry();
         Config config = new Config();
-        File configFile = new File(MazeGame.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "../gameconfig.json");
+        File rootFolder = (new File(MazeGame.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile();
+        File configFile = new File(rootFolder, "gameconfig.json");
         try {
             Config temp = Config.loadFromFile(configFile);
             if(temp != null) {
@@ -41,7 +42,8 @@ public class MazeGame {
             }
         }
         registry.registerBean(config, "config");
-        TileSetRegistry tileSetRegistry = new TileSetRegistry(config.getTileSetSearchPaths());
+        TileSetRegistry tileSetRegistry = new TileSetRegistry(rootFolder);
+        tileSetRegistry.setSearchPaths(config.getTileSetSearchPaths());
         registry.registerBean(tileSetRegistry, "tilesetregistry");
         TileMap selectedTileMap = null;
         tileSetRegistry.rescan();
