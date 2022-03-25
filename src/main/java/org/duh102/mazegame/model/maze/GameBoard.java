@@ -31,6 +31,7 @@ public class GameBoard implements Serializable {
     }
     public synchronized GameBoard setMaze(Maze maze) {
         this.maze = maze;
+        this.character.setPosition(maze.getEntrance());
         return this;
     }
 

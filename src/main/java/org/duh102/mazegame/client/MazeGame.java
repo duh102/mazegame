@@ -3,6 +3,7 @@ package org.duh102.mazegame.client;
 import org.duh102.mazegame.graphics.*;
 import org.duh102.mazegame.model.creation.MazeCarver;
 import org.duh102.mazegame.model.creation.generator.AldousBroderAlg;
+import org.duh102.mazegame.model.creation.generator.MazeGenerator;
 import org.duh102.mazegame.model.exception.maze.MazeException;
 import org.duh102.mazegame.model.exception.maze.generator.MazeGeneratorException;
 import org.duh102.mazegame.model.maze.ExitDirection;
@@ -18,12 +19,14 @@ import org.duh102.mazegame.util.TileSetRegistry;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 public class MazeGame {
     public static void main(String args[]) {
+        Random random = new Random();
         BeanRegistry registry = new BeanRegistry();
         Config config = new Config();
         File rootFolder = (new File(MazeGame.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile();
@@ -51,7 +54,6 @@ public class MazeGame {
         tileSetRegistry.rescan();
         if(tileSetRegistry.getDiscoveredTileSets().size() > 0) {
             try {
-                Random random = new Random();
                 List<TileSet> usableSets = tileSetRegistry.getDiscoveredTileSets();
                 System.out.printf("DEBUG Found %d tilesets: %s\n", usableSets.size(),
                         usableSets.stream().map(TileSet::getTileSetName).collect(Collectors.joining(", ")));
@@ -68,9 +70,13 @@ public class MazeGame {
         Provider<TileMap> tileMapProvider = new Provider<>(selectedTileMap);
         registry.registerBean(tileMapProvider, "tilemap");
 
+        registry.registerBean(new AldousBroderAlg(), "aldousbrodergen");
+
         Maze maze;
         try {
-            maze = (new AldousBroderAlg()).generate(10, 10);
+            List<MazeGenerator> mazeGenerators = new ArrayList<>(registry.getBeansOfType(MazeGenerator.class));
+            MazeGenerator selected = mazeGenerators.get(random.nextInt(mazeGenerators.size()));
+            maze = selected.generate(10, 10);
         } catch (MazeGeneratorException e) {
             maze = generateDemoMap();
         }

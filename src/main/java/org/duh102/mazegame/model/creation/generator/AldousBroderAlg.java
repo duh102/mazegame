@@ -18,6 +18,11 @@ public class AldousBroderAlg implements MazeGenerator {
     }
 
     @Override
+    public String getName() {
+        return "Aldous-Broder";
+    }
+
+    @Override
     public Maze generate(int xSize, int ySize) throws MazeGeneratorException {
         if(xSize < 2 || ySize < 2) {
             throw new MazeGeneratorException(String.format("Requested size (%d,%d) too small", xSize, ySize));

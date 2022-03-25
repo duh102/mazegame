@@ -27,9 +27,17 @@ public class GameWindow extends JFrame {
         menuBar.add(fileMenu);
         menuBar.addKeyListener(kl);
 
-        JMenuItem item = new JMenuItem("Load Maze", KeyEvent.VK_L);
+        JMenuItem item;
+
+        item = new JMenuItem("Load Maze", KeyEvent.VK_L);
         item.addKeyListener(kl);
         item.setActionCommand("lm");
+        item.addActionListener(actionListener);
+        fileMenu.add(item);
+
+        item = new JMenuItem("Generate Maze", KeyEvent.VK_G);
+        item.addKeyListener(kl);
+        item.setActionCommand("gm");
         item.addActionListener(actionListener);
         fileMenu.add(item);
 

@@ -5,5 +5,6 @@ import org.duh102.mazegame.model.maze.Maze;
 
 public interface MazeGenerator {
     Maze generate(int xSize, int ySize) throws MazeGeneratorException;
+    String getName();
     MazeGenerator seed(long seed);
 }
