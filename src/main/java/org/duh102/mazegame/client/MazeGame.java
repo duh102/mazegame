@@ -30,6 +30,7 @@ public class MazeGame {
         BeanRegistry registry = new BeanRegistry();
         Config config = new Config();
         File rootFolder = (new File(MazeGame.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile();
+        registry.registerBean(rootFolder, "root");
         File configFile = new File(rootFolder, "gameconfig.json");
         try {
             Config temp = Config.loadFromFile(configFile);

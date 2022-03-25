@@ -1,5 +1,8 @@
 package org.duh102.mazegame.client;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import org.duh102.mazegame.client.dialogs.MazeGenerationDialog;
 import org.duh102.mazegame.graphics.FallbackTileMap;
 import org.duh102.mazegame.graphics.FileBackedTileMap;
@@ -10,6 +13,7 @@ import org.duh102.mazegame.model.exception.maze.MazeException;
 import org.duh102.mazegame.model.exception.maze.generator.MazeGeneratorException;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
+import org.duh102.mazegame.model.serialization.MazeCustomizedGSON;
 import org.duh102.mazegame.model.tileset.TileSet;
 import org.duh102.mazegame.util.Point2DInt;
 import org.duh102.mazegame.util.Provider;
@@ -18,9 +22,10 @@ import org.duh102.mazegame.util.beanreg.CachedBeanRetriever;
 import org.duh102.mazegame.util.TileSetRegistry;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -32,6 +37,7 @@ public class MazeActionListener implements ActionListener {
     private CachedBeanRetriever<Provider<TileMap>> tileMapProvider;
     private CachedBeanRetriever<GameWindow> gameWindow;
     private CachedBeanRetriever<GameBoard> board;
+    private CachedBeanRetriever<File> rootFolder;
 
     public MazeActionListener(BeanRegistry registry) {
         this.registry = registry;
@@ -39,20 +45,34 @@ public class MazeActionListener implements ActionListener {
         tileMapProvider = new CachedBeanRetriever<>(registry, (Class<Provider<TileMap>>)(new Provider<TileMap>(new FallbackTileMap())).getClass());
         gameWindow = new CachedBeanRetriever<>(registry, GameWindow.class);
         board = new CachedBeanRetriever<>(registry, GameBoard.class);
+        rootFolder = new CachedBeanRetriever<>(registry, File.class, "root");
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        System.out.printf("Heard action %s\n", actionEvent.getActionCommand());
-        if(actionEvent.getActionCommand().equals("st")) {
+        String actionCommand = actionEvent.getActionCommand();
+        if(actionCommand.equals("st")) {
             chooseExistingTileSet();
-        } else if(actionEvent.getActionCommand().equals("gm")) {
+        } else if(actionCommand.equals("gm")) {
             Maze newMaze = generateMaze();
-            try {
-                board.get().setMaze(newMaze);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(gameWindow.get(), "Couldn't replace the maze");
+            if(newMaze != null) {
+                replaceMaze(newMaze);
             }
+        } else if(actionCommand.equals("lm")) {
+            Maze newMaze = loadMaze();
+            if(newMaze != null) {
+                replaceMaze(newMaze);
+            }
+        } else if(actionCommand.equals("sm")) {
+            saveMaze();
+        }
+    }
+
+    private void replaceMaze(Maze newMaze) {
+        try {
+            board.get().setMaze(newMaze);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(gameWindow.get(), "Couldn't replace the maze");
         }
     }
 
@@ -74,15 +94,17 @@ public class MazeActionListener implements ActionListener {
                     null,
                     possibilities,
                     tileSetNames.get(0));
-            TileSet selected = tileSets.get(tileSetNames.indexOf(s));
-            try {
-                TileMap newTMap = new FileBackedTileMap.Builder().loadFromTileSet(selected).build();
-                tMapProvider.replace(newTMap);
-                window.updateImage();
-                return newTMap;
-            } catch (MazeException | IOException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(window, "Unable to use that tileset, choose another or see log for details");
+            if(s != null) {
+                TileSet selected = tileSets.get(tileSetNames.indexOf(s));
+                try {
+                    TileMap newTMap = new FileBackedTileMap.Builder().loadFromTileSet(selected).build();
+                    tMapProvider.replace(newTMap);
+                    window.updateImage();
+                    return newTMap;
+                } catch (MazeException | IOException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(window, "Unable to use that tileset, choose another or see log for details");
+                }
             }
         } catch (NoBeanFoundException e) {
             e.printStackTrace();
@@ -108,6 +130,70 @@ public class MazeActionListener implements ActionListener {
             JOptionPane.showMessageDialog(gameWindow.get(), "Didn't find any maze generators");
         } catch (MazeGeneratorException mge) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Unable to generate maze; did you enter size less than 2x2?");
+        }
+        return null;
+    }
+
+    private Maze loadMaze() {
+        try {
+            GameWindow window = gameWindow.get();
+            File rootDir = rootFolder.get();
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "Maze files", "maze.json");
+            chooser.setFileFilter(filter);
+            chooser.setCurrentDirectory(rootDir);
+            int returnVal = chooser.showOpenDialog(window);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = chooser.getSelectedFile();
+                Gson json = MazeCustomizedGSON.getGson();
+                try {
+                    FileReader reader = new FileReader(selectedFile);
+                    Maze maze = json.fromJson(reader, Maze.class);
+                    return maze;
+                } catch(FileNotFoundException fnf) {
+                    JOptionPane.showMessageDialog(window, String.format("Maze file %s not found", selectedFile.getPath()));
+                } catch (JsonSyntaxException | JsonIOException e) {
+                    JOptionPane.showMessageDialog(window, String.format("Maze file invalid: %s", e.getMessage()));
+                    e.printStackTrace();
+                }
+            }
+        } catch (NoBeanFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private File saveMaze() {
+        try {
+            File rootDir = rootFolder.get();
+            GameBoard curBrd = board.get();
+            GameWindow window = gameWindow.get();
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "Maze files", "maze.json");
+            chooser.setFileFilter(filter);
+            chooser.setCurrentDirectory(rootDir);
+            int returnVal = chooser.showSaveDialog(window);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = chooser.getSelectedFile();
+                if(!selectedFile.getPath().endsWith(".maze.json")) {
+                    selectedFile = new File(selectedFile.getPath() + ".maze.json");
+                }
+                Gson json = MazeCustomizedGSON.getGsonBase().setPrettyPrinting().create();
+                try {
+                    System.err.printf("Saving maze to %s\n", selectedFile.getAbsolutePath());
+                    FileWriter fileWriter = new FileWriter(selectedFile);
+                    json.toJson(curBrd.getMaze(), fileWriter);
+                    fileWriter.close();
+                    return selectedFile;
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(window, String.format("Unable to write file: %s", e.getMessage()));
+                    e.printStackTrace();
+                }
+            }
+        } catch (NoBeanFoundException e) {
+            e.printStackTrace();
         }
         return null;
     }

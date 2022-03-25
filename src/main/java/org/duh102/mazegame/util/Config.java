@@ -39,6 +39,7 @@ public class Config {
         Gson json = MazeCustomizedGSON.getGsonBase().serializeNulls().setPrettyPrinting().create();
         FileWriter writer = new FileWriter(location);
         json.toJson(this, writer);
+        writer.close();
         return this;
     }
 
