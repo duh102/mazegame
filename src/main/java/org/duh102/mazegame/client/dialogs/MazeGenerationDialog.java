@@ -19,9 +19,10 @@ public class MazeGenerationDialog extends JDialog implements PropertyChangeListe
         super(frame, true);
         generatorCombo = new JComboBox<>(generatorList.toArray(new String[]{}));
         generatorCombo.setSelectedIndex(0);
-        SpinnerNumberModel model = new SpinnerNumberModel(10, 2, 100, 1);
-        xSpinner = new JSpinner(model);
-        ySpinner = new JSpinner(model);
+        SpinnerNumberModel model1 = new SpinnerNumberModel(10, 2, 100, 1);
+        SpinnerNumberModel model2 = new SpinnerNumberModel(10, 2, 100, 1);
+        xSpinner = new JSpinner(model1);
+        ySpinner = new JSpinner(model2);
         xSpinner.setValue(10);
         ySpinner.setValue(10);
         seedField = new JFormattedTextField(NumberFormat.getNumberInstance());

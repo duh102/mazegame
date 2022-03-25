@@ -69,8 +69,8 @@ public class MazeDisplay {
         Point2DInt charLoc = gb.getCharacter().getPosition();
         Maze maze = gb.getMaze();
         Point2DInt tileSize = tm.getTileSize();
-        int xTiles = (int)Math.ceil((xSize+0.0) / tileSize.getX());
-        int yTiles = (int)Math.ceil((ySize+0.0) / tileSize.getY());
+        int xTiles = (int)Math.ceil((xSize+0.0) / tileSize.getX())+2;
+        int yTiles = (int)Math.ceil((ySize+0.0) / tileSize.getY())+2;
         int xHalf = xTiles/2;
         int yHalf = yTiles/2;
         xTiles = (xHalf*2)+1;
@@ -83,7 +83,10 @@ public class MazeDisplay {
         for(int x = 0; x < xTiles; x++) {
             for(int y = 0; y < yTiles; y++) {
                 Point2DInt checkLoc = Point2DInt.of(charLoc.getX() - (xHalf-x), charLoc.getY() - (yHalf-y));
-                Point2DInt drawOffset = Point2DInt.of(halfImageWidth-((xHalf-x)*tileSize.getX())-halfTileX, halfImageHeight-((yHalf-y)*tileSize.getY())-halfTileY);
+                Point2DInt drawOffset = Point2DInt.of(
+                        (int)Math.round(halfImageWidth-((xHalf-x)*tileSize.getX())-halfTileX-incrementalCharPosition.getX()),
+                        (int)Math.round(halfImageHeight-((yHalf-y)*tileSize.getY())-halfTileY-incrementalCharPosition.getY())
+                );
                 Tile tileAt = maze.getTileAt(checkLoc);
                 Image tileImage = tm.getTileFor(tileAt, checkLoc.getX(), checkLoc.getY()).getImage();
                 drawWith.drawImage(tileImage, drawOffset.getX(), drawOffset.getY(), null);
@@ -91,7 +94,7 @@ public class MazeDisplay {
         }
         ImageWithOffset character = tm.getCharacterImage();
         Point2D.Double offset = character.getOffset();
-        drawWith.drawImage(character.getImage(), (int)Math.round(halfImageWidth+incrementalCharPosition.getX()-offset.getX()), (int)Math.round(halfImageHeight+incrementalCharPosition.getY()-offset.getY()), null);
+        drawWith.drawImage(character.getImage(), (int)Math.round(halfImageWidth-offset.getX()), (int)Math.round(halfImageHeight-offset.getY()), null);
         return flipActiveImage();
     }
 
