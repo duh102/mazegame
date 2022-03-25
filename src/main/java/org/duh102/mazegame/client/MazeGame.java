@@ -2,7 +2,9 @@ package org.duh102.mazegame.client;
 
 import org.duh102.mazegame.graphics.*;
 import org.duh102.mazegame.model.creation.MazeCarver;
+import org.duh102.mazegame.model.creation.generator.AldousBroderAlg;
 import org.duh102.mazegame.model.exception.maze.MazeException;
+import org.duh102.mazegame.model.exception.maze.generator.MazeGeneratorException;
 import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
@@ -66,7 +68,12 @@ public class MazeGame {
         Provider<TileMap> tileMapProvider = new Provider<>(selectedTileMap);
         registry.registerBean(tileMapProvider, "tilemap");
 
-        Maze maze = generateDemoMap();
+        Maze maze;
+        try {
+            maze = (new AldousBroderAlg()).generate(10, 10);
+        } catch (MazeGeneratorException e) {
+            maze = generateDemoMap();
+        }
         GameBoard board = new GameBoard(maze);
         registry.registerBean(board, "gameboard");
 
