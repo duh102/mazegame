@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException;
 import org.duh102.mazegame.client.dialogs.MazeGenerationDialog;
 import org.duh102.mazegame.graphics.FallbackTileMap;
 import org.duh102.mazegame.graphics.FileBackedTileMap;
+import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.graphics.TileMap;
 import org.duh102.mazegame.model.creation.generator.MazeGenerator;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
@@ -15,6 +16,7 @@ import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.serialization.MazeCustomizedGSON;
 import org.duh102.mazegame.model.tileset.TileSet;
+import org.duh102.mazegame.util.ExtendedFileNameExtensionFilter;
 import org.duh102.mazegame.util.Point2DInt;
 import org.duh102.mazegame.util.Provider;
 import org.duh102.mazegame.util.beanreg.BeanRegistry;
@@ -22,6 +24,7 @@ import org.duh102.mazegame.util.beanreg.CachedBeanRetriever;
 import org.duh102.mazegame.util.TileSetRegistry;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +41,7 @@ public class MazeActionListener implements ActionListener {
     private CachedBeanRetriever<GameWindow> gameWindow;
     private CachedBeanRetriever<GameBoard> board;
     private CachedBeanRetriever<File> rootFolder;
+    private CachedBeanRetriever<MazeDisplay> display;
 
     public MazeActionListener(BeanRegistry registry) {
         this.registry = registry;
@@ -46,6 +50,7 @@ public class MazeActionListener implements ActionListener {
         gameWindow = new CachedBeanRetriever<>(registry, GameWindow.class);
         board = new CachedBeanRetriever<>(registry, GameBoard.class);
         rootFolder = new CachedBeanRetriever<>(registry, File.class, "root");
+        display = new CachedBeanRetriever<>(registry, MazeDisplay.class);
     }
 
     @Override
@@ -70,9 +75,13 @@ public class MazeActionListener implements ActionListener {
 
     private void replaceMaze(Maze newMaze) {
         try {
-            board.get().setMaze(newMaze);
+            GameBoard brd = board.get();
+            MazeDisplay disp = display.get();
+            brd.setMaze(newMaze);
+            disp.resetMovement();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Couldn't replace the maze");
+            e.printStackTrace();
         }
     }
 
@@ -139,8 +148,7 @@ public class MazeActionListener implements ActionListener {
             GameWindow window = gameWindow.get();
             File rootDir = rootFolder.get();
             JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                    "Maze files", "maze.json");
+            FileFilter filter = new ExtendedFileNameExtensionFilter("Maze files", ".maze.json");
             chooser.setFileFilter(filter);
             chooser.setCurrentDirectory(rootDir);
             int returnVal = chooser.showOpenDialog(window);

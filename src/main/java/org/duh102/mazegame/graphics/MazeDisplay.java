@@ -141,6 +141,13 @@ public class MazeDisplay {
         incrementalCharPosition = new Point2D.Double(-diff.getX()*tileSize.getX(), -diff.getY()*tileSize.getY());
         return this;
     }
+    public synchronized MazeDisplay resetMovement() {
+        readyForMovement = true;
+        incrementalCharPosition = new Point2D.Double(0,0);
+        charCurr = board.get().getCharacter().getPosition();
+        charPrev = charCurr;
+        return this;
+    }
     public synchronized boolean readyForMovement() {
         return readyForMovement;
     }
