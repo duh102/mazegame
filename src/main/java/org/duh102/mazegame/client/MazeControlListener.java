@@ -16,12 +16,14 @@ public class MazeControlListener implements KeyListener {
     private BeanRegistry registry;
     private CachedBeanRetriever<MazeDisplay> mazeDisplay;
     private CachedBeanRetriever<GameBoard> gameBoard;
+    CachedBeanRetriever<GameStateContainer> gameStateContainer;
     private ExitDirection heldDirection = null;
 
     public MazeControlListener(BeanRegistry registry) {
         this.registry = registry;
         mazeDisplay = new CachedBeanRetriever<>(registry, MazeDisplay.class);
         gameBoard = new CachedBeanRetriever<>(registry, GameBoard.class);
+        gameStateContainer = new CachedBeanRetriever<>(registry, GameStateContainer.class);
     }
 
     @Override
@@ -66,18 +68,24 @@ public class MazeControlListener implements KeyListener {
     }
 
     public MazeControlListener notifyMovement(ExitDirection direction) {
+        MazeDisplay display = null;
+        GameBoard board = null;
+        GameStateContainer gameStateContainer = null;
         try {
-            mazeDisplay.get();
-            gameBoard.get();
+            display = mazeDisplay.get();
+            board = gameBoard.get();
+            gameStateContainer = this.gameStateContainer.get();
         } catch(NoBeanFoundException nbfe) {
-        }
-        if(! (mazeDisplay.hasBean() && gameBoard.hasBean()) ) {
             return this;
         }
-        if(direction != null && mazeDisplay.get().readyForMovement()) {
+        GameState state = gameStateContainer.getState();
+        if(state != GameState.WON && direction != null && display.readyForMovement()) {
             try {
-                gameBoard.get().move(direction);
-                mazeDisplay.get().notifyMoved();
+                board.move(direction);
+                display.notifyMoved();
+                if(state == GameState.PLAYING && board.hasWon()) {
+                    gameStateContainer.transition(GameState.WON);
+                }
             } catch(InvalidMoveException ime) {
                 // Just don't move then!
             }

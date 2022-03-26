@@ -77,7 +77,7 @@ public class MazeGame {
         try {
             List<MazeGenerator> mazeGenerators = new ArrayList<>(registry.getBeansOfType(MazeGenerator.class));
             MazeGenerator selected = mazeGenerators.get(random.nextInt(mazeGenerators.size()));
-            maze = selected.generate(10, 10);
+            maze = selected.generate(4, 4);
         } catch (MazeGeneratorException e) {
             maze = generateDemoMap();
         }
@@ -90,11 +90,14 @@ public class MazeGame {
         MazeResizeComponentListener mrcl = new MazeResizeComponentListener(registry);
         MazeActionListener mal = new MazeActionListener(registry);
         MazeDisplay display = new MazeDisplay(640, 480, registry);
+        GameStateContainer stateContainer = new GameStateContainer();
+        stateContainer.transition(GameState.PLAYING);
         registry.registerBean(ac, "animcontroller")
                 .registerBean(mcl, "controllistener")
                 .registerBean(mrcl, "resizelistener")
                 .registerBean(display, "mazedisplay")
-                .registerBean(mal, "actionlistener");
+                .registerBean(mal, "actionlistener")
+                .registerBean(stateContainer, "gameStateContainer");
 
         GameWindow window = new GameWindow(mcl, mal, mrcl, display, registry);
         registry.registerBean(window, "window");

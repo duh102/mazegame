@@ -42,6 +42,7 @@ public class MazeActionListener implements ActionListener {
     private CachedBeanRetriever<GameBoard> board;
     private CachedBeanRetriever<File> rootFolder;
     private CachedBeanRetriever<MazeDisplay> display;
+    CachedBeanRetriever<GameStateContainer> gameStateContainer;
 
     public MazeActionListener(BeanRegistry registry) {
         this.registry = registry;
@@ -51,6 +52,7 @@ public class MazeActionListener implements ActionListener {
         board = new CachedBeanRetriever<>(registry, GameBoard.class);
         rootFolder = new CachedBeanRetriever<>(registry, File.class, "root");
         display = new CachedBeanRetriever<>(registry, MazeDisplay.class);
+        gameStateContainer = new CachedBeanRetriever<>(registry, GameStateContainer.class);
     }
 
     @Override
@@ -77,8 +79,10 @@ public class MazeActionListener implements ActionListener {
         try {
             GameBoard brd = board.get();
             MazeDisplay disp = display.get();
+            GameStateContainer gsc = gameStateContainer.get();
             brd.setMaze(newMaze);
             disp.resetMovement();
+            gsc.transition(GameState.PLAYING);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Couldn't replace the maze");
             e.printStackTrace();

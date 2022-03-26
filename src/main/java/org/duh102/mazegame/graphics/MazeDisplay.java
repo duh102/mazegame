@@ -1,5 +1,7 @@
 package org.duh102.mazegame.graphics;
 
+import org.duh102.mazegame.client.GameState;
+import org.duh102.mazegame.client.GameStateContainer;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
@@ -24,6 +26,7 @@ public class MazeDisplay {
 
     CachedBeanRetriever<GameBoard> board;
     CachedBeanRetriever<Provider<TileMap>> tileMap;
+    CachedBeanRetriever<GameStateContainer> gameStateContainer;
 
     public MazeDisplay(int xSize, int ySize, BeanRegistry registry) {
         this.xSize = xSize;
@@ -32,6 +35,7 @@ public class MazeDisplay {
         images[1] = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_RGB);
         board = new CachedBeanRetriever<>(registry, GameBoard.class);
         tileMap = new CachedBeanRetriever<>(registry, (Class<Provider<TileMap>>)(new Provider<TileMap>(new FallbackTileMap())).getClass());
+        gameStateContainer = new CachedBeanRetriever<>(registry, GameStateContainer.class);
     }
     public MazeDisplay(BeanRegistry registry) {
         this(640, 480, registry);
@@ -51,13 +55,15 @@ public class MazeDisplay {
     public synchronized MazeDisplay redraw() {
         GameBoard gb = null;
         TileMap tm = null;
+        GameStateContainer gsc = null;
         try {
             gb = board.get();
             tm = tileMap.get().get();
+            gsc = gameStateContainer.get();
         } catch(NoBeanFoundException nbfe) {
             System.out.printf("Don't have %s\n", board.hasBean()? "tileMap" : "board");
         }
-        if( gb == null || tm == null ) {
+        if( gb == null || tm == null || gsc == null ) {
             getInactiveImage().getGraphics().clearRect(0, 0, xSize, ySize);
             return flipActiveImage();
         }
@@ -113,7 +119,30 @@ public class MazeDisplay {
         ImageWithOffset character = tm.getCharacterImage();
         Point2D.Double offset = character.getOffset();
         drawWith.drawImage(character.getImage(), (int)Math.round(halfImageWidth-offset.getX()), (int)Math.round(halfImageHeight-offset.getY()), null);
+        GameState gameState = gsc.getState();
+        if(gameState == GameState.WON) {
+            drawStringWithBackground("You win!", drawWith,
+                    Point2DInt.of(3,3), Point2DInt.of(halfImageWidth, halfImageHeight),
+                    Color.BLACK, Color.WHITE);
+        } else if(gameState == GameState.EDITING) {
+            drawStringWithBackground("EDITING", drawWith,
+                    Point2DInt.of(3,3), Point2DInt.of(halfImageWidth, halfImageHeight),
+                    null, Color.RED);
+        }
         return flipActiveImage();
+    }
+    private void drawStringWithBackground(String string, Graphics graphics, Point2DInt padding, Point2DInt center, Color bgColor, Color fgColor) {
+        FontMetrics fontMetrics = graphics.getFontMetrics();
+        Point2DInt stringSize = Point2DInt.of(fontMetrics.stringWidth(string), fontMetrics.getHeight());
+        Point2DInt halfStringSize = Point2DInt.of(stringSize.getX()/2, stringSize.getY()/2);
+        if(bgColor != null) {
+            graphics.setColor(bgColor);
+            graphics.fillRect(center.getX()-halfStringSize.getX()-padding.getX(),
+                    center.getY()-halfStringSize.getY()-padding.getY(),
+                    stringSize.getX() + padding.getX()*2, stringSize.getY() + padding.getY()*2);
+        }
+        graphics.setColor(fgColor);
+        graphics.drawString(string, center.getX()-halfStringSize.getX(), center.getY()+halfStringSize.getY()-padding.getY());
     }
 
     public MazeDisplay setIncrementalMovement(double pixelsToMove) {
