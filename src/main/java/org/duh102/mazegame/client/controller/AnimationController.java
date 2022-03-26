@@ -1,5 +1,6 @@
-package org.duh102.mazegame.client;
+package org.duh102.mazegame.client.controller;
 
+import org.duh102.mazegame.client.GameWindow;
 import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.util.beanreg.BeanRegistry;

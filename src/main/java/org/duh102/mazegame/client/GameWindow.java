@@ -1,5 +1,8 @@
 package org.duh102.mazegame.client;
 
+import org.duh102.mazegame.client.dialogs.FileMenuItem;
+import org.duh102.mazegame.client.dialogs.MazeMenuItem;
+import org.duh102.mazegame.client.dialogs.VisualMenuItem;
 import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.graphics.MazeResizeComponentListener;
 import org.duh102.mazegame.util.beanreg.BeanRegistry;
@@ -23,49 +26,40 @@ public class GameWindow extends JFrame {
 
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
-        fileMenu.setMnemonic(KeyEvent.VK_M);
+        JMenu mazeMenu = new JMenu("Maze");
+        JMenu visualMenu = new JMenu("Visual");
+
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+        mazeMenu.setMnemonic(KeyEvent.VK_M);
+        visualMenu.setMnemonic(KeyEvent.VK_V);
+
         menuBar.add(fileMenu);
+        menuBar.add(mazeMenu);
+        menuBar.add(visualMenu);
         menuBar.addKeyListener(kl);
 
         JMenuItem item;
-
-        item = new JMenuItem("Save Maze", KeyEvent.VK_S);
-        item.addKeyListener(kl);
-        item.setActionCommand("sm");
-        item.addActionListener(actionListener);
-        fileMenu.add(item);
-
-        item = new JMenuItem("Load Maze", KeyEvent.VK_L);
-        item.addKeyListener(kl);
-        item.setActionCommand("lm");
-        item.addActionListener(actionListener);
-        fileMenu.add(item);
-
-        item = new JMenuItem("Generate Maze", KeyEvent.VK_G);
-        item.addKeyListener(kl);
-        item.setActionCommand("gm");
-        item.addActionListener(actionListener);
-        fileMenu.add(item);
-
-        item = new JMenuItem("Load Tileset", KeyEvent.VK_O);
-        item.addKeyListener(kl);
-        item.setActionCommand("lt");
-        item.addActionListener(actionListener);
-        fileMenu.add(item);
-
-        item = new JMenuItem("Set Tileset", KeyEvent.VK_T);
-        item.addKeyListener(kl);
-        item.setActionCommand("st");
-        item.addActionListener(actionListener);
-        fileMenu.add(item);
-
-        fileMenu.addSeparator();
-
-        item = new JMenuItem("Quit", KeyEvent.VK_Q);
-        item.addKeyListener(kl);
-        item.setActionCommand("q");
-        item.addActionListener(actionListener);
-        fileMenu.add(item);
+        for(FileMenuItem fmi : FileMenuItem.values()) {
+            item = new JMenuItem(fmi.getDisplayText(), fmi.getKeyMnemonic());
+            item.addKeyListener(kl);
+            item.setActionCommand(fmi.getActionEvent());
+            item.addActionListener(actionListener);
+            fileMenu.add(item);
+        }
+        for(MazeMenuItem mmi : MazeMenuItem.values()) {
+            item = new JMenuItem(mmi.getDisplayText(), mmi.getKeyMnemonic());
+            item.addKeyListener(kl);
+            item.setActionCommand(mmi.getActionEvent());
+            item.addActionListener(actionListener);
+            mazeMenu.add(item);
+        }
+        for(VisualMenuItem vmi : VisualMenuItem.values()) {
+            item = new JMenuItem(vmi.getDisplayText(), vmi.getKeyMnemonic());
+            item.addKeyListener(kl);
+            item.setActionCommand(vmi.getActionEvent());
+            item.addActionListener(actionListener);
+            visualMenu.add(item);
+        }
 
         setJMenuBar(menuBar);
 

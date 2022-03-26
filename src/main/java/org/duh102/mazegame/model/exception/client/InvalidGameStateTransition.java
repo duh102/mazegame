@@ -1,6 +1,6 @@
 package org.duh102.mazegame.model.exception.client;
 
-import org.duh102.mazegame.client.GameState;
+import org.duh102.mazegame.client.state.GameState;
 
 public class InvalidGameStateTransition extends RuntimeException {
     public InvalidGameStateTransition() {

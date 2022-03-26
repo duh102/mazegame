@@ -1,5 +1,9 @@
 package org.duh102.mazegame.client;
 
+import org.duh102.mazegame.client.controller.AnimationController;
+import org.duh102.mazegame.client.controller.MazeActionListener;
+import org.duh102.mazegame.client.controller.MazeControlListener;
+import org.duh102.mazegame.client.state.MazeStateController;
 import org.duh102.mazegame.graphics.*;
 import org.duh102.mazegame.model.creation.MazeCarver;
 import org.duh102.mazegame.model.creation.generator.AldousBroderAlg;
@@ -7,7 +11,6 @@ import org.duh102.mazegame.model.creation.generator.MazeGenerator;
 import org.duh102.mazegame.model.exception.maze.MazeException;
 import org.duh102.mazegame.model.exception.maze.generator.MazeGeneratorException;
 import org.duh102.mazegame.model.maze.ExitDirection;
-import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.tileset.TileSet;
 import org.duh102.mazegame.util.Provider;

@@ -1,4 +1,4 @@
-package org.duh102.mazegame.client;
+package org.duh102.mazegame.client.state;
 
 public enum GameState {
     PLAYING,

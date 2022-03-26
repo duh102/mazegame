@@ -1,4 +1,4 @@
-package org.duh102.mazegame.client;
+package org.duh102.mazegame.client.state;
 
 import org.duh102.mazegame.model.exception.client.InvalidGameStateTransition;
 

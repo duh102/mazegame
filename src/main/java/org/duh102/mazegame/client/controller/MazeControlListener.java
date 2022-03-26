@@ -1,5 +1,6 @@
-package org.duh102.mazegame.client;
+package org.duh102.mazegame.client.controller;
 
+import org.duh102.mazegame.client.state.MazeStateController;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
 import org.duh102.mazegame.model.maze.ExitDirection;

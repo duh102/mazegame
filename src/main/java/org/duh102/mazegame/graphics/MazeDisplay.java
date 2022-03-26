@@ -1,7 +1,7 @@
 package org.duh102.mazegame.graphics;
 
-import org.duh102.mazegame.client.GameState;
-import org.duh102.mazegame.client.MazeStateController;
+import org.duh102.mazegame.client.state.GameState;
+import org.duh102.mazegame.client.state.MazeStateController;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.maze.Tile;

@@ -1,12 +1,16 @@
-package org.duh102.mazegame.client;
+package org.duh102.mazegame.client.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import org.duh102.mazegame.client.GameWindow;
+import org.duh102.mazegame.client.dialogs.FileMenuItem;
 import org.duh102.mazegame.client.dialogs.MazeGenerationDialog;
+import org.duh102.mazegame.client.dialogs.MazeMenuItem;
+import org.duh102.mazegame.client.dialogs.VisualMenuItem;
+import org.duh102.mazegame.client.state.MazeStateController;
 import org.duh102.mazegame.graphics.FallbackTileMap;
 import org.duh102.mazegame.graphics.FileBackedTileMap;
-import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.graphics.TileMap;
 import org.duh102.mazegame.model.creation.generator.MazeGenerator;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
@@ -24,7 +28,6 @@ import org.duh102.mazegame.util.TileSetRegistry;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -34,13 +37,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MazeActionListener implements ActionListener {
-    private BeanRegistry registry;
-    private CachedBeanRetriever<TileSetRegistry> tileSetRegistry;
-    private CachedBeanRetriever<Provider<TileMap>> tileMapProvider;
-    private CachedBeanRetriever<GameWindow> gameWindow;
-    private CachedBeanRetriever<MazeStateController> mazeStateController;
-    private CachedBeanRetriever<File> rootFolder;
-    private CachedBeanRetriever<MazeDisplay> display;
+    private final BeanRegistry registry;
+    private final CachedBeanRetriever<TileSetRegistry> tileSetRegistry;
+    private final CachedBeanRetriever<Provider<TileMap>> tileMapProvider;
+    private final CachedBeanRetriever<GameWindow> gameWindow;
+    private final CachedBeanRetriever<MazeStateController> mazeStateController;
+    private final CachedBeanRetriever<File> rootFolder;
 
     public MazeActionListener(BeanRegistry registry) {
         this.registry = registry;
@@ -49,25 +51,26 @@ public class MazeActionListener implements ActionListener {
         gameWindow = new CachedBeanRetriever<>(registry, GameWindow.class);
         mazeStateController = new CachedBeanRetriever<>(registry, MazeStateController.class);
         rootFolder = new CachedBeanRetriever<>(registry, File.class, "root");
-        display = new CachedBeanRetriever<>(registry, MazeDisplay.class);
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String actionCommand = actionEvent.getActionCommand();
-        if(actionCommand.equals("st")) {
+        if(actionCommand.equals(FileMenuItem.QUIT.getActionEvent())) {
+            System.exit(0);
+        } else if(actionCommand.equals(VisualMenuItem.SET.getActionEvent())) {
             chooseExistingTileSet();
-        } else if(actionCommand.equals("gm")) {
+        } else if(actionCommand.equals(MazeMenuItem.GENERATE.getActionEvent())) {
             Maze newMaze = generateMaze();
             if(newMaze != null) {
                 replaceMaze(newMaze);
             }
-        } else if(actionCommand.equals("lm")) {
+        } else if(actionCommand.equals(FileMenuItem.LOAD.getActionEvent())) {
             Maze newMaze = loadMaze();
             if(newMaze != null) {
                 replaceMaze(newMaze);
             }
-        } else if(actionCommand.equals("sm")) {
+        } else if(actionCommand.equals(FileMenuItem.SAVE.getActionEvent())) {
             saveMaze();
         }
     }

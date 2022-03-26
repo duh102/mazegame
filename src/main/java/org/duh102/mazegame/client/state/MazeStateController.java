@@ -1,4 +1,4 @@
-package org.duh102.mazegame.client;
+package org.duh102.mazegame.client.state;
 
 import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.model.creation.MazeCarver;
@@ -45,6 +45,9 @@ public class MazeStateController {
             return null;
         }
         return board.getMaze();
+    }
+    public synchronized void startEditing() {
+        gameStateContainer.transition(GameState.EDITING);
     }
 
     public void move(ExitDirection direction, boolean modifierDown) throws InvalidMoveException {
