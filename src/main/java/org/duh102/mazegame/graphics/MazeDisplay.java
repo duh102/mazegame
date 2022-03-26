@@ -1,9 +1,8 @@
 package org.duh102.mazegame.graphics;
 
 import org.duh102.mazegame.client.GameState;
-import org.duh102.mazegame.client.GameStateContainer;
+import org.duh102.mazegame.client.MazeStateController;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
-import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.maze.Tile;
 import org.duh102.mazegame.util.Provider;
@@ -24,18 +23,16 @@ public class MazeDisplay {
     private Point2DInt charCurr;
     private boolean readyForMovement = true;
 
-    private CachedBeanRetriever<GameBoard> board;
-    private CachedBeanRetriever<Provider<TileMap>> tileMap;
-    private CachedBeanRetriever<GameStateContainer> gameStateContainer;
+    private final CachedBeanRetriever<MazeStateController> mazeStateController;
+    private final CachedBeanRetriever<Provider<TileMap>> tileMap;
 
     public MazeDisplay(int xSize, int ySize, BeanRegistry registry) {
         this.xSize = xSize;
         this.ySize = ySize;
         images[0] = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_RGB);
         images[1] = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_RGB);
-        board = new CachedBeanRetriever<>(registry, GameBoard.class);
+        mazeStateController = new CachedBeanRetriever<>(registry, MazeStateController.class);
         tileMap = new CachedBeanRetriever<>(registry, (Class<Provider<TileMap>>)(new Provider<TileMap>(new FallbackTileMap())).getClass());
-        gameStateContainer = new CachedBeanRetriever<>(registry, GameStateContainer.class);
     }
     public MazeDisplay(BeanRegistry registry) {
         this(640, 480, registry);
@@ -53,29 +50,27 @@ public class MazeDisplay {
     }
 
     public synchronized MazeDisplay redraw() {
-        GameBoard gb = null;
+        MazeStateController sc = null;
         TileMap tm = null;
-        GameStateContainer gsc = null;
         try {
-            gb = board.get();
+            sc = mazeStateController.get();
             tm = tileMap.get().get();
-            gsc = gameStateContainer.get();
         } catch(NoBeanFoundException nbfe) {
-            System.out.printf("Don't have %s\n", board.hasBean()? "tileMap" : "board");
+            System.out.printf("Don't have %s\n", mazeStateController.hasBean()? "tileMap" : "board");
         }
-        if( gb == null || tm == null || gsc == null ) {
+        if( sc == null || tm == null ) {
             getInactiveImage().getGraphics().clearRect(0, 0, xSize, ySize);
             return flipActiveImage();
         }
-        Point2DInt entrance = gb.getMaze().getEntrance();
-        Point2DInt exit = gb.getMaze().getExit();
+        Point2DInt entrance = sc.getMaze().getEntrance();
+        Point2DInt exit = sc.getMaze().getExit();
         if(charCurr == null) {
-            charCurr = gb.getCharacter().getPosition();
+            charCurr = sc.getBoard().getCharacter().getPosition();
             charPrev = charCurr;
             incrementalCharPosition = new Point2D.Double(0, 0);
         }
-        Point2DInt charLoc = gb.getCharacter().getPosition();
-        Maze maze = gb.getMaze();
+        Point2DInt charLoc = sc.getBoard().getCharacter().getPosition();
+        Maze maze = sc.getMaze();
         Point2DInt tileSize = tm.getTileSize();
         int xTiles = (int)Math.ceil((xSize+0.0) / tileSize.getX())+2;
         int yTiles = (int)Math.ceil((ySize+0.0) / tileSize.getY())+2;
@@ -119,7 +114,7 @@ public class MazeDisplay {
         ImageWithOffset character = tm.getCharacterImage();
         Point2D.Double offset = character.getOffset();
         drawWith.drawImage(character.getImage(), (int)Math.round(halfImageWidth-offset.getX()), (int)Math.round(halfImageHeight-offset.getY()), null);
-        GameState gameState = gsc.getState();
+        GameState gameState = sc.getGameStateContainer().getState();
         if(gameState == GameState.WON) {
             drawStringWithBackground("You win!", drawWith,
                     Point2DInt.of(3,3), Point2DInt.of(halfImageWidth, halfImageHeight),
@@ -185,7 +180,7 @@ public class MazeDisplay {
     public synchronized MazeDisplay notifyMoved() {
         readyForMovement = false;
         charPrev = charCurr;
-        charCurr = board.get().getCharacter().getPosition();
+        charCurr = mazeStateController.get().getBoard().getCharacter().getPosition();
         Point2DInt diff = charCurr.sub(charPrev);
         Point2DInt tileSize = tileMap.get().get().getTileSize();
         incrementalCharPosition = new Point2D.Double(-diff.getX()*tileSize.getX(), -diff.getY()*tileSize.getY());
@@ -194,7 +189,7 @@ public class MazeDisplay {
     public synchronized MazeDisplay resetMovement() {
         readyForMovement = true;
         incrementalCharPosition = new Point2D.Double(0,0);
-        charCurr = board.get().getCharacter().getPosition();
+        charCurr = mazeStateController.get().getBoard().getCharacter().getPosition();
         charPrev = charCurr;
         return this;
     }

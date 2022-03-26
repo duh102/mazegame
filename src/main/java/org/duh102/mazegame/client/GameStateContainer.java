@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class GameStateContainer {
-    private GameState currentState;
+    private GameState currentState = GameState.PLAYING;
     public GameStateContainer() {}
 
     private static final Map<GameState, Set<GameState>> VALID_TRANSITION_MAP = Map.of(
@@ -26,6 +26,6 @@ public class GameStateContainer {
         return this;
     }
     public static boolean canTransition(GameState current, GameState newState) {
-        return current == null || VALID_TRANSITION_MAP.get(current).contains(newState);
+        return VALID_TRANSITION_MAP.get(current).contains(newState);
     }
 }

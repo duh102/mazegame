@@ -40,6 +40,11 @@ public class MazeCarver {
         entering.getExits().addExit(direction.getOpposite());
         return this;
     }
+    public MazeCarver resize(int xSize, int ySize) {
+        maze = new Maze(xSize, ySize);
+        carveLocation = Point2DInt.of(0,0);
+        return this;
+    }
 
     public Maze getMaze() {
         return maze;

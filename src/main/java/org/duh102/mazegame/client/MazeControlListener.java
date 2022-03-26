@@ -1,29 +1,23 @@
 package org.duh102.mazegame.client;
 
-import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
 import org.duh102.mazegame.model.maze.ExitDirection;
-import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.util.beanreg.BeanRegistry;
 import org.duh102.mazegame.util.beanreg.CachedBeanRetriever;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MazeControlListener implements KeyListener {
-    private BeanRegistry registry;
-    private CachedBeanRetriever<MazeDisplay> mazeDisplay;
-    private CachedBeanRetriever<GameBoard> gameBoard;
-    private CachedBeanRetriever<GameStateContainer> gameStateContainer;
+    private final CachedBeanRetriever<MazeStateController> mazeStateController;
     private ExitDirection heldDirection = null;
+    private final AtomicBoolean heldModifier = new AtomicBoolean(false);
 
     public MazeControlListener(BeanRegistry registry) {
-        this.registry = registry;
-        mazeDisplay = new CachedBeanRetriever<>(registry, MazeDisplay.class);
-        gameBoard = new CachedBeanRetriever<>(registry, GameBoard.class);
-        gameStateContainer = new CachedBeanRetriever<>(registry, GameStateContainer.class);
+        mazeStateController = new CachedBeanRetriever<>(registry, MazeStateController.class);
     }
 
     @Override
@@ -38,6 +32,7 @@ public class MazeControlListener implements KeyListener {
         if(direction != null) {
             heldDirection = direction;
         }
+        heldModifier.set(keyEvent.isControlDown());
     }
 
     @Override
@@ -46,6 +41,7 @@ public class MazeControlListener implements KeyListener {
         if(Objects.equals(direction, heldDirection)) {
             heldDirection = null;
         }
+        heldModifier.set(keyEvent.isControlDown());
     }
 
     private ExitDirection decodeKey(int keyCode) {
@@ -68,27 +64,12 @@ public class MazeControlListener implements KeyListener {
     }
 
     public MazeControlListener notifyMovement(ExitDirection direction) {
-        MazeDisplay display = null;
-        GameBoard board = null;
-        GameStateContainer gameStateContainer = null;
+        boolean isModifierDown = heldModifier.get();
         try {
-            display = mazeDisplay.get();
-            board = gameBoard.get();
-            gameStateContainer = this.gameStateContainer.get();
-        } catch(NoBeanFoundException nbfe) {
-            return this;
-        }
-        GameState state = gameStateContainer.getState();
-        if(state != GameState.WON && direction != null && display.readyForMovement()) {
-            try {
-                board.move(direction);
-                display.notifyMoved();
-                if(state == GameState.PLAYING && board.hasWon()) {
-                    gameStateContainer.transition(GameState.WON);
-                }
-            } catch(InvalidMoveException ime) {
-                // Just don't move then!
-            }
+            MazeStateController stateController = mazeStateController.get();
+            stateController.move(direction, isModifierDown);
+        } catch (NoBeanFoundException | InvalidMoveException e) {
+            // Don't move then!
         }
         return this;
     }

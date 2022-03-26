@@ -12,7 +12,6 @@ import org.duh102.mazegame.model.creation.generator.MazeGenerator;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
 import org.duh102.mazegame.model.exception.maze.MazeException;
 import org.duh102.mazegame.model.exception.maze.generator.MazeGeneratorException;
-import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
 import org.duh102.mazegame.model.serialization.MazeCustomizedGSON;
 import org.duh102.mazegame.model.tileset.TileSet;
@@ -39,20 +38,18 @@ public class MazeActionListener implements ActionListener {
     private CachedBeanRetriever<TileSetRegistry> tileSetRegistry;
     private CachedBeanRetriever<Provider<TileMap>> tileMapProvider;
     private CachedBeanRetriever<GameWindow> gameWindow;
-    private CachedBeanRetriever<GameBoard> board;
+    private CachedBeanRetriever<MazeStateController> mazeStateController;
     private CachedBeanRetriever<File> rootFolder;
     private CachedBeanRetriever<MazeDisplay> display;
-    private CachedBeanRetriever<GameStateContainer> gameStateContainer;
 
     public MazeActionListener(BeanRegistry registry) {
         this.registry = registry;
         tileSetRegistry = new CachedBeanRetriever<>(registry, TileSetRegistry.class);
         tileMapProvider = new CachedBeanRetriever<>(registry, (Class<Provider<TileMap>>)(new Provider<TileMap>(new FallbackTileMap())).getClass());
         gameWindow = new CachedBeanRetriever<>(registry, GameWindow.class);
-        board = new CachedBeanRetriever<>(registry, GameBoard.class);
+        mazeStateController = new CachedBeanRetriever<>(registry, MazeStateController.class);
         rootFolder = new CachedBeanRetriever<>(registry, File.class, "root");
         display = new CachedBeanRetriever<>(registry, MazeDisplay.class);
-        gameStateContainer = new CachedBeanRetriever<>(registry, GameStateContainer.class);
     }
 
     @Override
@@ -77,12 +74,8 @@ public class MazeActionListener implements ActionListener {
 
     private void replaceMaze(Maze newMaze) {
         try {
-            GameBoard brd = board.get();
-            MazeDisplay disp = display.get();
-            GameStateContainer gsc = gameStateContainer.get();
-            brd.setMaze(newMaze);
-            disp.resetMovement();
-            gsc.transition(GameState.PLAYING);
+            MazeStateController brd = mazeStateController.get();
+            brd.replaceMaze(newMaze);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Couldn't replace the maze");
             e.printStackTrace();
@@ -92,6 +85,7 @@ public class MazeActionListener implements ActionListener {
     private TileMap chooseExistingTileSet() {
         try {
             List<TileSet> tileSets = tileSetRegistry.get().getDiscoveredTileSets();
+            tileSets.sort(Comparator.comparing(TileSet::getTileSetName));
             if(tileSets.size() == 0) {
                 return null;
             }
@@ -179,11 +173,10 @@ public class MazeActionListener implements ActionListener {
     private File saveMaze() {
         try {
             File rootDir = rootFolder.get();
-            GameBoard curBrd = board.get();
+            MazeStateController stateController = mazeStateController.get();
             GameWindow window = gameWindow.get();
             JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                    "Maze files", "maze.json");
+            FileFilter filter = new ExtendedFileNameExtensionFilter("Maze files", ".maze.json");
             chooser.setFileFilter(filter);
             chooser.setCurrentDirectory(rootDir);
             int returnVal = chooser.showSaveDialog(window);
@@ -196,7 +189,7 @@ public class MazeActionListener implements ActionListener {
                 try {
                     System.err.printf("Saving maze to %s\n", selectedFile.getAbsolutePath());
                     FileWriter fileWriter = new FileWriter(selectedFile);
-                    json.toJson(curBrd.getMaze(), fileWriter);
+                    json.toJson(stateController.getMaze(), fileWriter);
                     fileWriter.close();
                     return selectedFile;
                 } catch (IOException e) {

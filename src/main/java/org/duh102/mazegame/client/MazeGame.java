@@ -81,8 +81,6 @@ public class MazeGame {
         } catch (MazeGeneratorException e) {
             maze = generateDemoMap();
         }
-        GameBoard board = new GameBoard(maze);
-        registry.registerBean(board, "gameboard");
 
 
         AnimationController ac = new AnimationController(60, registry);
@@ -90,14 +88,15 @@ public class MazeGame {
         MazeResizeComponentListener mrcl = new MazeResizeComponentListener(registry);
         MazeActionListener mal = new MazeActionListener(registry);
         MazeDisplay display = new MazeDisplay(640, 480, registry);
-        GameStateContainer stateContainer = new GameStateContainer();
-        stateContainer.transition(GameState.PLAYING);
+        MazeStateController stateController = new MazeStateController(registry);
         registry.registerBean(ac, "animcontroller")
                 .registerBean(mcl, "controllistener")
                 .registerBean(mrcl, "resizelistener")
                 .registerBean(display, "mazedisplay")
                 .registerBean(mal, "actionlistener")
-                .registerBean(stateContainer, "gameStateContainer");
+                .registerBean(stateController, "mazeStateController");
+
+        stateController.replaceMaze(maze);
 
         GameWindow window = new GameWindow(mcl, mal, mrcl, display, registry);
         registry.registerBean(window, "window");
