@@ -3,6 +3,7 @@ package org.duh102.mazegame.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import org.duh102.mazegame.model.exception.maze.tileset.TileSetException;
 import org.duh102.mazegame.model.serialization.MazeCustomizedGSON;
 import org.duh102.mazegame.model.tileset.TileSet;
 
@@ -67,13 +68,20 @@ public class TileSetRegistry {
                 try {
                     FileReader reader = new FileReader(tileFile);
                     TileSet tileSet = jsonReader.fromJson(reader, TileSet.class);
+                    if(!tileSet.isFullyDefined()) {
+                        throw new TileSetException("Not fully defined");
+                    }
                     String tileDir = tileFile.getParent();
                     tileSet.setTileFile(new File(tileDir, tileSet.getTileFile()).getPath());
                     tileSet.setCharacterFile(new File(tileDir, tileSet.getCharacterFile()).getPath());
+                    tileSet.setEntranceFile(new File(tileDir, tileSet.getEntranceFile()).getPath());
+                    tileSet.setExitFile(new File(tileDir, tileSet.getExitFile()).getPath());
                     foundTileSets.add(tileSet);
                 } catch (FileNotFoundException | JsonSyntaxException | JsonIOException e) {
                     System.err.printf("Didn't find a valid TileSet in %s\n", tileFile.toString());
                     e.printStackTrace();
+                } catch (TileSetException tse) {
+                    System.err.printf("Exception in loading TileSet in %s: %s\n", tileFile.toString(), tse.getMessage());
                 }
             }
         }

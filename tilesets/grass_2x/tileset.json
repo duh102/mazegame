@@ -2,6 +2,8 @@
   "tileSetName": "Grass 2x",
   "tileImages": "grass_tileset_2x_3.png",
   "characterImage": "grass_character_2x.png",
+  "entranceImage": "grass_start.png",
+  "exitImage": "grass_finish.png",
   "tileSize": {
     "x": 64,
     "y": 64
@@ -14,5 +16,13 @@
   "characterImageOffset": {
     "first": 16.0,
     "second": 20.0
+  },
+  "entranceImageOffset": {
+    "first": 32.0,
+    "second": 32.0
+  },
+  "exitImageOffset": {
+    "first": 32.0,
+    "second": 50.0
   }
 }

@@ -16,6 +16,8 @@ public class FallbackTileMap implements TileMap {
     public static final Point2DInt FALLBACK_CHAR_SIZE = Point2DInt.of(24, 24);
     private ImageWithOffset blankTile;
     private ImageWithOffset characterImage;
+    private ImageWithOffset entranceImage;
+    private ImageWithOffset exitImage;
     private Map<Byte, ImageWithOffset> tileImages;
 
     public FallbackTileMap() {
@@ -26,6 +28,8 @@ public class FallbackTileMap implements TileMap {
         }
         characterImage = generateCharacter();
         blankTile = generateBlankTile();
+        entranceImage = generateEntranceImage();
+        exitImage = generateExitImage();
     }
     public ImageWithOffset generateTile(ExitDirectionSet exits) {
         int xSize = FALLBACK_TILE_SIZE.getX();
@@ -66,6 +70,30 @@ public class FallbackTileMap implements TileMap {
         g.clearRect(0,0,xSize,ySize);
         return new ImageWithOffset(image);
     }
+    public ImageWithOffset generateEntranceImage() {
+        int xSize = FALLBACK_CHAR_SIZE.getX();
+        int ySize = FALLBACK_CHAR_SIZE.getY();
+        BufferedImage image = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        g2d.setComposite(AlphaComposite.Clear);
+        g2d.fillRect(0, 0, xSize, ySize);
+        g2d.setComposite(AlphaComposite.Src);
+        g2d.setColor(Color.GREEN);
+        g2d.drawRect(3, 3, xSize-6, ySize-6);
+        return new ImageWithOffset(image, new Point2D.Double(xSize/2.0, ySize/2.0));
+    }
+    public ImageWithOffset generateExitImage() {
+        int xSize = FALLBACK_CHAR_SIZE.getX();
+        int ySize = FALLBACK_CHAR_SIZE.getY();
+        BufferedImage image = new BufferedImage(xSize, ySize, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        g2d.setComposite(AlphaComposite.Clear);
+        g2d.fillRect(0, 0, xSize, ySize);
+        g2d.setComposite(AlphaComposite.Src);
+        g2d.setColor(Color.RED);
+        g2d.drawOval(3, 3, xSize-6, ySize-6);
+        return new ImageWithOffset(image, new Point2D.Double(xSize/2.0, ySize/2.0));
+    }
 
     @Override
     public ImageWithOffset getTileFor(Tile tile, int x, int y) {
@@ -81,5 +109,15 @@ public class FallbackTileMap implements TileMap {
     @Override
     public ImageWithOffset getCharacterImage() {
         return characterImage;
+    }
+
+    @Override
+    public ImageWithOffset getEntranceImage() {
+        return entranceImage;
+    }
+
+    @Override
+    public ImageWithOffset getExitImage() {
+        return exitImage;
     }
 }

@@ -4,10 +4,12 @@ import org.duh102.mazegame.model.exception.maze.MazeException;
 import org.duh102.mazegame.model.exception.maze.tileset.TileSizeException;
 import org.duh102.mazegame.model.maze.Tile;
 import org.duh102.mazegame.model.tileset.TileSet;
+import org.duh102.mazegame.util.Pair;
 import org.duh102.mazegame.util.Point2DInt;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,14 +19,22 @@ import java.util.List;
 
 public class FileBackedTileMap implements TileMap {
     private ImageWithOffset characterImage;
+    private ImageWithOffset entranceImage;
+    private ImageWithOffset exitImage;
     private Map<Byte, List<ImageWithOffset>> tileImages;
     private TileSet tileset;
 
     Random random = new Random();
 
 
-    public FileBackedTileMap(ImageWithOffset characterImage, Map<Byte, List<ImageWithOffset>> tileImages, TileSet tileset) {
+    public FileBackedTileMap(ImageWithOffset characterImage,
+                             ImageWithOffset entranceImage,
+                             ImageWithOffset exitImage,
+                             Map<Byte, List<ImageWithOffset>> tileImages,
+                             TileSet tileset) {
         this.characterImage = characterImage;
+        this.entranceImage = entranceImage;
+        this.exitImage = exitImage;
         this.tileImages = tileImages;
         this.tileset = tileset;
     }
@@ -49,26 +59,39 @@ public class FileBackedTileMap implements TileMap {
     public ImageWithOffset getCharacterImage() {
         return characterImage;
     }
+    @Override
+    public ImageWithOffset getEntranceImage() {
+        return entranceImage;
+    }
+    @Override
+    public ImageWithOffset getExitImage() {
+        return exitImage;
+    }
 
     public TileSet getTileSet() {
         return tileset;
     }
     public static class Builder {
-        private TileSet tileset;
         private ImageWithOffset characterImage;
+        private ImageWithOffset entranceImage;
+        private ImageWithOffset exitImage;
         private Map<Byte, List<ImageWithOffset>> tileImages;
+        private TileSet tileset;
 
         public Builder() {
         }
 
         public Builder loadFromTileSet(TileSet tileset) throws IOException, TileSizeException {
             this.tileset = tileset;
-            characterImage = loadAndOffsetCharacter(tileset);
+            characterImage = loadAndOffsetImage(tileset.getCharacterFile(), convertDoublePair(tileset.getCharacterImageOffset()));
+            entranceImage = loadAndOffsetImage(tileset.getEntranceFile(), convertDoublePair(tileset.getEntranceImageOffset()));
+            exitImage = loadAndOffsetImage(tileset.getExitFile(), convertDoublePair(tileset.getExitImageOffset()));
             tileImages = loadAndOffsetTiles(tileset);
             return this;
         }
         public FileBackedTileMap build() throws MazeException {
-            if(tileset == null || characterImage == null || tileImages == null) {
+            if(tileset == null || characterImage == null || entranceImage == null
+                    || exitImage == null || tileImages == null) {
                 List<String> nulledItems = new ArrayList<>();
                 if(tileset == null) {
                     nulledItems.add("tileset");
@@ -76,24 +99,29 @@ public class FileBackedTileMap implements TileMap {
                 if(characterImage == null) {
                     nulledItems.add("character image");
                 }
+                if(entranceImage == null) {
+                    nulledItems.add("entrance image");
+                }
+                if(exitImage == null) {
+                    nulledItems.add("exit image");
+                }
                 if(tileImages == null) {
                     nulledItems.add("tile images");
                 }
                 throw new MazeException(String.format("Programmer error: %s are null; ensure you provided them to the builder", String.join(", ", nulledItems)));
             }
-            return new FileBackedTileMap(characterImage, tileImages, tileset);
+            return new FileBackedTileMap(characterImage, entranceImage, exitImage, tileImages, tileset);
         }
 
-        private ImageWithOffset loadAndOffsetCharacter(TileSet tileset) throws IOException {
-            File characterFile = new File(tileset.getCharacterFile());
+        private ImageWithOffset loadAndOffsetImage(String fileName, Point2D.Double offset) throws IOException {
+            File characterFile = new File(fileName);
             if (!characterFile.exists()) {
-                throw new FileNotFoundException(tileset.getCharacterFile());
+                throw new FileNotFoundException(fileName);
             }
             Image imageData = ImageIO.read(characterFile);
 
-            return new ImageWithOffset(imageData, tileset.getCharacterImageOffset());
+            return new ImageWithOffset(imageData, offset);
         }
-
         private Map<Byte, List<ImageWithOffset>> loadAndOffsetTiles(TileSet tileset) throws IOException, TileSizeException {
             File tileFile = new File(tileset.getTileFile());
             if (!tileFile.exists()) {
@@ -129,6 +157,9 @@ public class FileBackedTileMap implements TileMap {
                 tileLookupMap.put(x, variantsOfTile);
             }
             return tileLookupMap;
+        }
+        private Point2D.Double convertDoublePair(Pair<Double, Double> pair) {
+            return new Point2D.Double(pair.getFirst(), pair.getSecond());
         }
     }
     private long generateSeedForBlank(int x, int y) {

@@ -7,4 +7,6 @@ public interface TileMap {
     ImageWithOffset getTileFor(Tile tile, int x, int y);
     Point2DInt getTileSize();
     ImageWithOffset getCharacterImage();
+    ImageWithOffset getEntranceImage();
+    ImageWithOffset getExitImage();
 }

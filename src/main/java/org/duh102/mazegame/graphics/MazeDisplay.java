@@ -61,6 +61,8 @@ public class MazeDisplay {
             getInactiveImage().getGraphics().clearRect(0, 0, xSize, ySize);
             return flipActiveImage();
         }
+        Point2DInt entrance = gb.getMaze().getEntrance();
+        Point2DInt exit = gb.getMaze().getExit();
         if(charCurr == null) {
             charCurr = gb.getCharacter().getPosition();
             charPrev = charCurr;
@@ -90,6 +92,22 @@ public class MazeDisplay {
                 Tile tileAt = maze.getTileAt(checkLoc);
                 Image tileImage = tm.getTileFor(tileAt, checkLoc.getX(), checkLoc.getY()).getImage();
                 drawWith.drawImage(tileImage, drawOffset.getX(), drawOffset.getY(), null);
+                if (checkLoc.equals(entrance)) {
+                    ImageWithOffset entImage = tm.getEntranceImage();
+                    Point2D.Double entOff = entImage.getOffset();
+                    drawWith.drawImage(entImage.getImage(),
+                            (int)Math.round(drawOffset.getX()+halfTileX-entOff.getX()),
+                            (int)Math.round(drawOffset.getY()+halfTileY-entOff.getY()),
+                            null);
+                }
+                if (checkLoc.equals(exit)) {
+                    ImageWithOffset exImage = tm.getExitImage();
+                    Point2D.Double entOff = exImage.getOffset();
+                    drawWith.drawImage(exImage.getImage(),
+                            (int)Math.round(drawOffset.getX()+halfTileX-entOff.getX()),
+                            (int)Math.round(drawOffset.getY()+halfTileY-entOff.getY()),
+                            null);
+                }
             }
         }
         ImageWithOffset character = tm.getCharacterImage();

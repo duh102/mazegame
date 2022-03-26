@@ -95,16 +95,24 @@ public class TestComplexSerialization {
     public void  testTileSetSerialization() {
         String tileFile = "a/file/location";
         String charFile = "another/file/location";
+        String entFile = "yet/another/file/location";
+        String exFile = "some/other/file/location";
         Point2DInt tileSize = Point2DInt.of(16,16);
         Point2DInt tileStartOffset = Point2DInt.of(0,0);
         int variants = 4;
         Pair<Double, Double> characterImageOffset = Pair.of(1.2, 4.5);
+        Pair<Double, Double> entranceImageOffset = Pair.of(4.5, 9.9);
+        Pair<Double, Double> exitImageOffset = Pair.of(2.4, 10.5);
 
-        TileSet from = new TileSet("test", tileFile, charFile, tileSize, tileStartOffset, variants, characterImageOffset);
+        TileSet from = new TileSet("test", tileFile, entFile, exFile, charFile,
+                tileSize, tileStartOffset, variants,
+                characterImageOffset, entranceImageOffset, exitImageOffset);
         String json = testJson.toJson(from);
         assertThat(json).isEqualTo("{\n" +
                 "  \"tileImages\": \"a/file/location\",\n" +
                 "  \"characterImage\": \"another/file/location\",\n" +
+                "  \"entranceImage\": \"yet/another/file/location\",\n" +
+                "  \"exitImage\": \"some/other/file/location\",\n" +
                 "  \"tileSize\": {\n" +
                 "    \"x\": 16,\n" +
                 "    \"y\": 16\n" +
@@ -117,6 +125,14 @@ public class TestComplexSerialization {
                 "  \"characterImageOffset\": {\n" +
                 "    \"first\": 1.2,\n" +
                 "    \"second\": 4.5\n" +
+                "  },\n" +
+                "  \"entranceImageOffset\": {\n" +
+                "    \"first\": 4.5,\n" +
+                "    \"second\": 9.9\n" +
+                "  },\n" +
+                "  \"exitImageOffset\": {\n" +
+                "    \"first\": 2.4,\n" +
+                "    \"second\": 10.5\n" +
                 "  },\n" +
                 "  \"tileSetName\": \"test\"\n" +
                 "}");
