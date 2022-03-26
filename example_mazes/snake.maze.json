@@ -1,0 +1,84 @@
+{
+  "tiles": [
+    [
+      {
+        "exits": 6,
+        "variantSeed": -1956795528
+      },
+      {
+        "exits": 3,
+        "variantSeed": -875546595
+      },
+      {
+        "exits": 6,
+        "variantSeed": 617478341
+      },
+      {
+        "exits": 3,
+        "variantSeed": 1350687522
+      }
+    ],
+    [
+      {
+        "exits": 10,
+        "variantSeed": -1509144094
+      },
+      {
+        "exits": 10,
+        "variantSeed": 671742346
+      },
+      {
+        "exits": 10,
+        "variantSeed": -1532676064
+      },
+      {
+        "exits": 10,
+        "variantSeed": 1591535264
+      }
+    ],
+    [
+      {
+        "exits": 10,
+        "variantSeed": 0
+      },
+      {
+        "exits": 10,
+        "variantSeed": 1582227295
+      },
+      {
+        "exits": 10,
+        "variantSeed": -527332411
+      },
+      {
+        "exits": 10,
+        "variantSeed": 1460731525
+      }
+    ],
+    [
+      {
+        "exits": 8,
+        "variantSeed": -750615462
+      },
+      {
+        "exits": 12,
+        "variantSeed": 2025387199
+      },
+      {
+        "exits": 9,
+        "variantSeed": 2104046162
+      },
+      {
+        "exits": 8,
+        "variantSeed": -1014434791
+      }
+    ]
+  ],
+  "entrance": {
+    "x": 3,
+    "y": 3
+  },
+  "exit": {
+    "x": 3,
+    "y": 0
+  }
+}

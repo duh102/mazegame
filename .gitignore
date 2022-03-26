@@ -48,3 +48,4 @@ gameconfig.json
 /out
 
 /package
+*.zip

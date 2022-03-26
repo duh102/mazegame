@@ -1,0 +1,32 @@
+{
+  "tiles": [
+    [
+      {
+        "exits": 2,
+        "variantSeed": 1431162155
+      },
+      {
+        "exits": 2,
+        "variantSeed": -73789608
+      }
+    ],
+    [
+      {
+        "exits": 12,
+        "variantSeed": -1728529858
+      },
+      {
+        "exits": 9,
+        "variantSeed": 0
+      }
+    ]
+  ],
+  "entrance": {
+    "x": 1,
+    "y": 1
+  },
+  "exit": {
+    "x": 0,
+    "y": 0
+  }
+}
