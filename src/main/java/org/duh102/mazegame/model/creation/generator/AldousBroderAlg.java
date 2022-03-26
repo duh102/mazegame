@@ -29,12 +29,29 @@ public class AldousBroderAlg implements MazeGenerator {
         }
         MazeCarver carver = new MazeCarver(xSize, ySize);
         Maze maze = carver.getMaze();
-        Point2DInt entrance = Point2DInt.of(random.nextInt(xSize), random.nextInt(ySize));
+        // Place the entrance somewhere in the middle
+        Point2DInt mazeCenter = Point2DInt.of(xSize/2, ySize/2);
+        Point2DInt entrance = Point2DInt.of(random.nextInt(2)+mazeCenter.getX()-1, random.nextInt(2)+mazeCenter.getY()-1);
         maze.setEntrance(entrance);
         Point2DInt exit;
         do {
-            exit = Point2DInt.of(random.nextInt(xSize), random.nextInt(ySize));
+            int side = random.nextInt(4);
+            switch(side) {
+                case 0: // top
+                    exit = Point2DInt.of(random.nextInt(xSize), 0);
+                    break;
+                case 1: // right
+                    exit = Point2DInt.of(xSize-1, random.nextInt(ySize));
+                    break;
+                case 2: // bottom
+                    exit = Point2DInt.of(random.nextInt(xSize), ySize-1);
+                    break;
+                case 3: // left
+                default:
+                    exit = Point2DInt.of(0, random.nextInt(ySize));
+            }
         } while(exit.equals(entrance));
+        maze.setExit(exit);
         Point2DInt current = entrance.copy();
         Point2DInt next;
         ExitDirection[] directions = ExitDirection.values();

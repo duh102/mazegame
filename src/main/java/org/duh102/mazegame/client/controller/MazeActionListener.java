@@ -136,12 +136,15 @@ public class MazeActionListener implements ActionListener {
             MazeGenerationDialog mgd = new MazeGenerationDialog(gameWindow.get(), generatorNames);
             mgd.pack();
             mgd.setVisible(true);
-            int selectedGen = mgd.getChosenGenerator();
-            Point2DInt size = mgd.getChosenSize();
-            long seed = mgd.getSeed();
-            MazeGenerator selected = mazeGenerators.get(selectedGen);
-            Maze generated = selected.seed(seed).generate(size.getX(), size.getY());
-            return generated;
+            int exitMethod = mgd.getExitMethod();
+            if(exitMethod == 0) {
+                int selectedGen = mgd.getChosenGenerator();
+                Point2DInt size = mgd.getChosenSize();
+                long seed = mgd.getSeed();
+                MazeGenerator selected = mazeGenerators.get(selectedGen);
+                Maze generated = selected.seed(seed).generate(size.getX(), size.getY());
+                return generated;
+            }
         } catch (NoBeanFoundException e) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Didn't find any maze generators");
         } catch (MazeGeneratorException mge) {
