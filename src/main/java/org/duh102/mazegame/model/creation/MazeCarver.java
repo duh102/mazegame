@@ -6,6 +6,8 @@ import org.duh102.mazegame.model.maze.Tile;
 import org.duh102.mazegame.model.exception.maze.NotInMazeException;
 import org.duh102.mazegame.util.Point2DInt;
 
+import java.util.Random;
+
 public class MazeCarver {
     Maze maze;
     Point2DInt carveLocation;
@@ -53,6 +55,11 @@ public class MazeCarver {
         carveLocation = newPos;
         exiting.getExits().closeExit(direction);
         entering.getExits().closeExit(direction.getOpposite());
+        return this;
+    }
+    public MazeCarver randomizeTileAppearance() {
+        Tile here = maze.getTileAt(carveLocation);
+        here.setVariantSeed(new Random().nextInt());
         return this;
     }
 

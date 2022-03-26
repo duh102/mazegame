@@ -22,9 +22,13 @@ tileset.json needs to have several parameters defined to work:
 * tileSetName
 * tileImages
 * characterImage
+* entranceImage
+* exitImage
 * tileSize
 * tileStartOffset
 * characterImageOffset
+* entranceImageOffset
+* exitImageOffset
 * variants
 
 Each is relatively self-explanatory, but in detail:
@@ -36,6 +40,10 @@ Each is relatively self-explanatory, but in detail:
   * Path, relative to the tileset.json-containing directory, of where the floor tiles image is
 * characterImage
   * Path, relative to the tileset.json-containing directory, of where the character image is
+* entranceImage
+  * Path, relative to the tileset.json-containing directory, of where the entrance overlay image is
+* exitImage
+  * Path, relative to the tileset.json-containing directory, of where the exit overlay image is
 * tileSize
   * An object describing the width and height of a tile
   * The x property indicates width, in pixels, y indicates height
@@ -48,6 +56,12 @@ Each is relatively self-explanatory, but in detail:
   * You can also think of it as, in pixels from the top and left of the image, the "root" of the image should be
   * The image will be moved this many pixels left and up relative to the center of the tile that the character is on
   * The first property indicates how many pixels left (subpixels accepted), the second property indicates how many pixels up
+* entranceImageOffset
+  * An object describing how the entrance image should be manipulated relative to the center of the tile marked as the entrance
+  * Works like the characterImageOffset; the image will be moved this many pixels left and up relative to the center of the tile
+* exitImageOffset
+  * An object describing how the exit image should be manipulated relative to the center of the tile marked as the exit
+  * Works like the characterImageOffset; the image will be moved this many pixels left and up relative to the center of the tile
 * variants
   * This property indicates how many variants of your tiles you have included in the tileset
   * Variants are read vertically, tile directions are read horizontally
@@ -59,6 +73,8 @@ Here is an example
   "tileSetName": "Grass 2x",
   "tileImages": "grass_tileset_2x_3.png",
   "characterImage": "grass_character_2x.png",
+  "entranceImage": "grass_start.png",
+  "exitImage": "grass_finish.png",
   "tileSize": {
     "x": 64,
     "y": 64
@@ -71,6 +87,14 @@ Here is an example
   "characterImageOffset": {
     "first": 16.0,
     "second": 20.0
+  },
+  "entranceImageOffset": {
+    "first": 32.0,
+    "second": 32.0
+  },
+  "exitImageOffset": {
+    "first": 32.0,
+    "second": 50.0
   }
 }
 ```

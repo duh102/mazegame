@@ -64,6 +64,13 @@ public class MazeStateController {
             }
         }
     }
+    public synchronized void goToEditMode() {
+        GameState state = gameStateContainer.getState();
+        if(state == GameState.EDITING) {
+            return;
+        }
+        gameStateContainer.transition(GameState.EDITING);
+    }
 
     private void editSetLocation(boolean isEntrance) {
         GameState state = gameStateContainer.getState();
@@ -86,6 +93,18 @@ public class MazeStateController {
     }
     public void editSetExit() {
         editSetLocation(false);
+    }
+    public void editRandomizeTile() {
+        GameState state = gameStateContainer.getState();
+        if(state != GameState.EDITING) {
+            return;
+        }
+        try {
+            carver.repositionKnife(board.getCharacter().getPosition());
+            carver.randomizeTileAppearance();
+        } catch (NotInMazeException e) {
+            e.printStackTrace();
+        }
     }
     public void move(ExitDirection direction, boolean carveModifier, boolean sealModifier) {
         GameState state = gameStateContainer.getState();

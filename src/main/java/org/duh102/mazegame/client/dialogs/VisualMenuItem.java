@@ -3,7 +3,6 @@ package org.duh102.mazegame.client.dialogs;
 import static java.awt.event.KeyEvent.*;
 
 public enum VisualMenuItem {
-    LOAD("Load TileSet from File", VK_L, "tl"),
     SET("Set Loaded TileSet", VK_S, "ts");
 
     private String displayText;

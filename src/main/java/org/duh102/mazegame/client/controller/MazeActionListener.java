@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import org.duh102.mazegame.client.GameWindow;
-import org.duh102.mazegame.client.dialogs.FileMenuItem;
-import org.duh102.mazegame.client.dialogs.MazeGenerationDialog;
-import org.duh102.mazegame.client.dialogs.MazeMenuItem;
-import org.duh102.mazegame.client.dialogs.VisualMenuItem;
+import org.duh102.mazegame.client.dialogs.*;
 import org.duh102.mazegame.client.state.MazeStateController;
 import org.duh102.mazegame.graphics.FallbackTileMap;
 import org.duh102.mazegame.graphics.FileBackedTileMap;
@@ -60,15 +57,19 @@ public class MazeActionListener implements ActionListener {
             System.exit(0);
         } else if(actionCommand.equals(FileMenuItem.LOAD.getActionEvent())) {
             Maze newMaze = loadMaze();
-            if(newMaze != null) {
-                replaceMaze(newMaze);
-            }
+            replaceMaze(newMaze);
         } else if(actionCommand.equals(FileMenuItem.SAVE.getActionEvent())) {
             saveMaze();
         } else if(actionCommand.equals(MazeMenuItem.GENERATE.getActionEvent())) {
             Maze newMaze = generateMaze();
-            if(newMaze != null) {
-                replaceMaze(newMaze);
+            replaceMaze(newMaze);
+        } else if (actionCommand.equals(MazeMenuItem.NEW.getActionEvent())) {
+            Maze newMaze = createEmptyMaze();
+            replaceMaze(newMaze);
+            try {
+                mazeStateController.get().goToEditMode();
+            } catch (NoBeanFoundException e) {
+                e.printStackTrace();
             }
         } else if (actionCommand.equals(MazeMenuItem.EDIT.getActionEvent())) {
             try {
@@ -82,6 +83,9 @@ public class MazeActionListener implements ActionListener {
     }
 
     private void replaceMaze(Maze newMaze) {
+        if(newMaze == null) {
+            return;
+        }
         try {
             MazeStateController msc = mazeStateController.get();
             msc.replaceMaze(newMaze);
@@ -147,6 +151,27 @@ public class MazeActionListener implements ActionListener {
             }
         } catch (NoBeanFoundException e) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Didn't find any maze generators");
+        } catch (MazeGeneratorException mge) {
+            JOptionPane.showMessageDialog(gameWindow.get(), "Unable to generate maze; did you enter size less than 2x2?");
+        }
+        return null;
+    }
+
+    private Maze createEmptyMaze() {
+        try {
+            NewMazeDialog nmd = new NewMazeDialog(gameWindow.get());
+            nmd.pack();
+            nmd.setVisible(true);
+            int exitMethod = nmd.getExitMethod();
+            if(exitMethod == 0) {
+                Point2DInt size = nmd.getChosenSize();
+                if(size.getX() < 2 || size.getY() < 2) {
+                    throw new MazeGeneratorException();
+                }
+                return new Maze(size.getX(), size.getY());
+            }
+        } catch (NoBeanFoundException e) {
+            JOptionPane.showMessageDialog(gameWindow.get(), "Programmer error: unable to find the game window!");
         } catch (MazeGeneratorException mge) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Unable to generate maze; did you enter size less than 2x2?");
         }

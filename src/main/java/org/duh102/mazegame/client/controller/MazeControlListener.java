@@ -2,7 +2,6 @@ package org.duh102.mazegame.client.controller;
 
 import org.duh102.mazegame.client.state.MazeStateController;
 import org.duh102.mazegame.model.exception.beanregistry.NoBeanFoundException;
-import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
 import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.util.beanreg.BeanRegistry;
 import org.duh102.mazegame.util.beanreg.CachedBeanRetriever;
@@ -32,6 +31,9 @@ public class MazeControlListener implements KeyListener {
         if(keyCode == KeyEvent.VK_E || keyCode == KeyEvent.VK_F) {
             decodeSetLocation(keyCode);
         }
+        if(keyCode == KeyEvent.VK_R) {
+            notifyRandomizeTile();
+        }
     }
 
     @Override
@@ -55,6 +57,9 @@ public class MazeControlListener implements KeyListener {
         altDown.set(keyEvent.isAltDown());
         if(keyCode == KeyEvent.VK_E || keyCode == KeyEvent.VK_F) {
             decodeSetLocation(keyCode);
+        }
+        if(keyCode == KeyEvent.VK_R) {
+            notifyRandomizeTile();
         }
     }
 
@@ -90,6 +95,15 @@ public class MazeControlListener implements KeyListener {
     }
     public MazeControlListener notifyMovement() {
         notifyMovement(heldDirection);
+        return this;
+    }
+    public MazeControlListener notifyRandomizeTile() {
+        try {
+            MazeStateController stateController = mazeStateController.get();
+            stateController.editRandomizeTile();
+        } catch (NoBeanFoundException e) {
+            // No controller, no problem
+        }
         return this;
     }
     private MazeControlListener decodeSetLocation(int keyCode) {

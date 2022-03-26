@@ -120,8 +120,8 @@ public class MazeDisplay {
                     Point2DInt.of(3,3), Point2DInt.of(halfImageWidth, halfImageHeight),
                     Color.BLACK, Color.WHITE);
         } else if(gameState == GameState.EDITING) {
-            drawStringWithBackground("EDITING\nCtrl+Move: Carve\nAlt+Move: Seal\nE: Set entrance\nF: Set exit", drawWith,
-                    Point2DInt.of(3,3), Point2DInt.of(60, 50),
+            drawStringWithBackground("EDITING\nCtrl+Move: Carve\nAlt+Move: Seal\nE: Set entrance\nF: Set exit\nR: Randomize tile image", drawWith,
+                    Point2DInt.of(3,3), Point2DInt.of(80, 54),
                     Color.WHITE, Color.RED);
         }
         return flipActiveImage();
