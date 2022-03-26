@@ -16,7 +16,7 @@ public class MazeControlListener implements KeyListener {
     private BeanRegistry registry;
     private CachedBeanRetriever<MazeDisplay> mazeDisplay;
     private CachedBeanRetriever<GameBoard> gameBoard;
-    CachedBeanRetriever<GameStateContainer> gameStateContainer;
+    private CachedBeanRetriever<GameStateContainer> gameStateContainer;
     private ExitDirection heldDirection = null;
 
     public MazeControlListener(BeanRegistry registry) {

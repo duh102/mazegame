@@ -42,7 +42,7 @@ public class MazeActionListener implements ActionListener {
     private CachedBeanRetriever<GameBoard> board;
     private CachedBeanRetriever<File> rootFolder;
     private CachedBeanRetriever<MazeDisplay> display;
-    CachedBeanRetriever<GameStateContainer> gameStateContainer;
+    private CachedBeanRetriever<GameStateContainer> gameStateContainer;
 
     public MazeActionListener(BeanRegistry registry) {
         this.registry = registry;

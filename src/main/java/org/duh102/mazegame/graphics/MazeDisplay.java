@@ -24,9 +24,9 @@ public class MazeDisplay {
     private Point2DInt charCurr;
     private boolean readyForMovement = true;
 
-    CachedBeanRetriever<GameBoard> board;
-    CachedBeanRetriever<Provider<TileMap>> tileMap;
-    CachedBeanRetriever<GameStateContainer> gameStateContainer;
+    private CachedBeanRetriever<GameBoard> board;
+    private CachedBeanRetriever<Provider<TileMap>> tileMap;
+    private CachedBeanRetriever<GameStateContainer> gameStateContainer;
 
     public MazeDisplay(int xSize, int ySize, BeanRegistry registry) {
         this.xSize = xSize;

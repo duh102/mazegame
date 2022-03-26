@@ -10,9 +10,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 public class MazeResizeComponentListener implements ComponentListener {
-    BeanRegistry registry;
-    CachedBeanRetriever<MazeDisplay> mazeDisplay;
-    CachedBeanRetriever<GameWindow> gameWindow;
+    private BeanRegistry registry;
+    private CachedBeanRetriever<MazeDisplay> mazeDisplay;
+    private CachedBeanRetriever<GameWindow> gameWindow;
 
     public MazeResizeComponentListener(BeanRegistry registry) {
         this.registry = registry;
