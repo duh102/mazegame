@@ -1,6 +1,7 @@
 package org.duh102.mazegame.model.maze;
 
 import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
+import org.duh102.mazegame.util.Point2DInt;
 
 import java.io.Serializable;
 
@@ -20,6 +21,14 @@ public class GameBoard implements Serializable {
             throw new InvalidMoveException();
         }
         character.move(direction);
+        return this;
+    }
+    public synchronized GameBoard teleport(ExitDirection direction) throws InvalidMoveException {
+        Point2DInt newLocation = character.getPosition().add(direction.getMoveDirection());
+        if(!maze.canTeleport(newLocation)) {
+            throw new InvalidMoveException();
+        }
+        character.teleport(newLocation);
         return this;
     }
     public synchronized boolean hasWon() {

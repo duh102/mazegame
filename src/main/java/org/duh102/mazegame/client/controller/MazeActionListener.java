@@ -58,13 +58,6 @@ public class MazeActionListener implements ActionListener {
         String actionCommand = actionEvent.getActionCommand();
         if(actionCommand.equals(FileMenuItem.QUIT.getActionEvent())) {
             System.exit(0);
-        } else if(actionCommand.equals(VisualMenuItem.SET.getActionEvent())) {
-            chooseExistingTileSet();
-        } else if(actionCommand.equals(MazeMenuItem.GENERATE.getActionEvent())) {
-            Maze newMaze = generateMaze();
-            if(newMaze != null) {
-                replaceMaze(newMaze);
-            }
         } else if(actionCommand.equals(FileMenuItem.LOAD.getActionEvent())) {
             Maze newMaze = loadMaze();
             if(newMaze != null) {
@@ -72,13 +65,26 @@ public class MazeActionListener implements ActionListener {
             }
         } else if(actionCommand.equals(FileMenuItem.SAVE.getActionEvent())) {
             saveMaze();
+        } else if(actionCommand.equals(MazeMenuItem.GENERATE.getActionEvent())) {
+            Maze newMaze = generateMaze();
+            if(newMaze != null) {
+                replaceMaze(newMaze);
+            }
+        } else if (actionCommand.equals(MazeMenuItem.EDIT.getActionEvent())) {
+            try {
+                mazeStateController.get().toggleEditing();
+            } catch (NoBeanFoundException e) {
+                e.printStackTrace();
+            }
+        } else if(actionCommand.equals(VisualMenuItem.SET.getActionEvent())) {
+            chooseExistingTileSet();
         }
     }
 
     private void replaceMaze(Maze newMaze) {
         try {
-            MazeStateController brd = mazeStateController.get();
-            brd.replaceMaze(newMaze);
+            MazeStateController msc = mazeStateController.get();
+            msc.replaceMaze(newMaze);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(gameWindow.get(), "Couldn't replace the maze");
             e.printStackTrace();

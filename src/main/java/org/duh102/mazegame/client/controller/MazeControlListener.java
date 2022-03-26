@@ -15,7 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MazeControlListener implements KeyListener {
     private final CachedBeanRetriever<MazeStateController> mazeStateController;
     private ExitDirection heldDirection = null;
-    private final AtomicBoolean heldModifier = new AtomicBoolean(false);
+    private final AtomicBoolean ctrlDown = new AtomicBoolean(false);
+    private final AtomicBoolean altDown = new AtomicBoolean(false);
 
     public MazeControlListener(BeanRegistry registry) {
         mazeStateController = new CachedBeanRetriever<>(registry, MazeStateController.class);
@@ -23,8 +24,14 @@ public class MazeControlListener implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent keyEvent) {
-        ExitDirection direction = decodeKey(keyEvent.getKeyCode());
-        notifyMovement(direction);
+        int keyCode = keyEvent.getKeyCode();
+        ExitDirection direction = decodeKey(keyCode);
+        if(direction != null) {
+            notifyMovement(direction);
+        }
+        if(keyCode == KeyEvent.VK_E || keyCode == KeyEvent.VK_F) {
+            decodeSetLocation(keyCode);
+        }
     }
 
     @Override
@@ -33,16 +40,22 @@ public class MazeControlListener implements KeyListener {
         if(direction != null) {
             heldDirection = direction;
         }
-        heldModifier.set(keyEvent.isControlDown());
+        ctrlDown.set(keyEvent.isControlDown());
+        altDown.set(keyEvent.isAltDown());
     }
 
     @Override
     public void keyReleased(KeyEvent keyEvent) {
-        ExitDirection direction = decodeKey(keyEvent.getKeyCode());
+        int keyCode = keyEvent.getKeyCode();
+        ExitDirection direction = decodeKey(keyCode);
         if(Objects.equals(direction, heldDirection)) {
             heldDirection = null;
         }
-        heldModifier.set(keyEvent.isControlDown());
+        ctrlDown.set(keyEvent.isControlDown());
+        altDown.set(keyEvent.isAltDown());
+        if(keyCode == KeyEvent.VK_E || keyCode == KeyEvent.VK_F) {
+            decodeSetLocation(keyCode);
+        }
     }
 
     private ExitDirection decodeKey(int keyCode) {
@@ -64,18 +77,36 @@ public class MazeControlListener implements KeyListener {
         }
     }
 
-    public MazeControlListener notifyMovement(ExitDirection direction) {
-        boolean isModifierDown = heldModifier.get();
+    private MazeControlListener notifyMovement(ExitDirection direction) {
+        boolean isCtrlDown = ctrlDown.get();
+        boolean isAltDown = altDown.get();
         try {
             MazeStateController stateController = mazeStateController.get();
-            stateController.move(direction, isModifierDown);
-        } catch (NoBeanFoundException | InvalidMoveException e) {
+            stateController.move(direction, isCtrlDown, isAltDown);
+        } catch (NoBeanFoundException e) {
             // Don't move then!
         }
         return this;
     }
     public MazeControlListener notifyMovement() {
         notifyMovement(heldDirection);
+        return this;
+    }
+    private MazeControlListener decodeSetLocation(int keyCode) {
+        if(keyCode != KeyEvent.VK_E && keyCode != KeyEvent.VK_F) {
+            return this;
+        }
+        try {
+            MazeStateController stateController = mazeStateController.get();
+            // E == start, F == finish
+            if(keyCode == KeyEvent.VK_E) {
+                stateController.editSetEntrance();
+            } else {
+                stateController.editSetExit();
+            }
+        } catch (NoBeanFoundException e) {
+            // Don't move then!
+        }
         return this;
     }
 }

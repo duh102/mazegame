@@ -11,8 +11,11 @@ public class MazeCarver {
     Point2DInt carveLocation;
 
     public MazeCarver(int xSize, int ySize) {
-        maze = new Maze(xSize, ySize);
-        carveLocation = Point2DInt.of(0,0);
+        this(new Maze(xSize, ySize));
+    }
+    public MazeCarver(Maze maze) {
+        this.maze = maze;
+        carveLocation = maze.getEntrance();
     }
     public MazeCarver() {
         this(2,2);
@@ -40,14 +43,26 @@ public class MazeCarver {
         entering.getExits().addExit(direction.getOpposite());
         return this;
     }
-    public MazeCarver resize(int xSize, int ySize) {
-        maze = new Maze(xSize, ySize);
-        carveLocation = Point2DInt.of(0,0);
+    public MazeCarver seal(ExitDirection direction) throws NotInMazeException {
+        Point2DInt newPos = carveLocation.add(direction.getMoveDirection());
+        if(!maze.isIn(newPos)) {
+            throw new NotInMazeException();
+        }
+        Tile exiting = maze.getTileAt(carveLocation);
+        Tile entering = maze.getTileAt(newPos);
+        carveLocation = newPos;
+        exiting.getExits().closeExit(direction);
+        entering.getExits().closeExit(direction.getOpposite());
         return this;
     }
 
     public Maze getMaze() {
         return maze;
+    }
+    public MazeCarver setMaze(Maze maze) {
+        this.maze = maze;
+        carveLocation = maze.getEntrance();
+        return this;
     }
     public Point2DInt getCarveLocation() {
         return carveLocation;

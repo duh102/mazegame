@@ -73,6 +73,10 @@ public class Maze implements Serializable {
         }
         return true;
     }
+    public boolean canTeleport(Point2DInt target) {
+        Tile tileAt = getTileAt(target);
+        return tileAt != null;
+    }
     public Tile getTileAt(Point2DInt location) {
         if(!isIn(location)) {
             return null;

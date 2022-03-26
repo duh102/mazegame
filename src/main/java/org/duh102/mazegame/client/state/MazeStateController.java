@@ -4,6 +4,7 @@ import org.duh102.mazegame.graphics.MazeDisplay;
 import org.duh102.mazegame.model.creation.MazeCarver;
 import org.duh102.mazegame.model.exception.client.InvalidGameStateTransition;
 import org.duh102.mazegame.model.exception.maze.InvalidMoveException;
+import org.duh102.mazegame.model.exception.maze.NotInMazeException;
 import org.duh102.mazegame.model.maze.ExitDirection;
 import org.duh102.mazegame.model.maze.GameBoard;
 import org.duh102.mazegame.model.maze.Maze;
@@ -25,6 +26,7 @@ public class MazeStateController {
     }
     public synchronized MazeStateController replaceMaze(Maze maze) {
         board = new GameBoard(maze);
+        carver = new MazeCarver(board.getMaze());
         try {
             MazeDisplay display = mazeDisplay.get();
             display.resetMovement();
@@ -46,23 +48,72 @@ public class MazeStateController {
         }
         return board.getMaze();
     }
-    public synchronized void startEditing() {
-        gameStateContainer.transition(GameState.EDITING);
+    public synchronized void toggleEditing() {
+        GameState state = gameStateContainer.getState();
+        if(state == GameState.PLAYING || state == GameState.WON) {
+            gameStateContainer.transition(GameState.EDITING);
+        } else {
+            gameStateContainer.transition(GameState.PLAYING);
+            board.getCharacter().teleport(getBoard().getMaze().getEntrance());
+            try {
+                MazeDisplay display = mazeDisplay.get();
+                display.resetMovement();
+            } catch (Exception e) {
+                // If we don't have a display, then we don't need to reset the movement!
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void move(ExitDirection direction, boolean modifierDown) throws InvalidMoveException {
+    private void editSetLocation(boolean isEntrance) {
+        GameState state = gameStateContainer.getState();
+        if(state != GameState.EDITING) {
+            return;
+        }
+        try {
+            carver.repositionKnife(board.getCharacter().getPosition());
+            if(isEntrance) {
+                carver.setEntrance();
+            } else {
+                carver.setExit();
+            }
+        } catch (NotInMazeException e) {
+            e.printStackTrace();
+        }
+    }
+    public void editSetEntrance() {
+        editSetLocation(true);
+    }
+    public void editSetExit() {
+        editSetLocation(false);
+    }
+    public void move(ExitDirection direction, boolean carveModifier, boolean sealModifier) {
         GameState state = gameStateContainer.getState();
         try {
             MazeDisplay display = mazeDisplay.get();
             if(state != GameState.WON && direction != null && display.readyForMovement()) {
                 try {
-                    // if we're doing carving, do that too
-                    board.move(direction);
-                    display.notifyMoved();
-                    if(state == GameState.PLAYING && board.hasWon()) {
-                        gameStateContainer.transition(GameState.WON);
+                    carver.repositionKnife(board.getCharacter().getPosition());
+                    if(state == GameState.EDITING) {
+                        if(!(carveModifier || sealModifier)) {
+                            board.teleport(direction);
+                        } else {
+                            if(sealModifier) {
+                                board.move(direction);
+                                carver.seal(direction);
+                            } else {
+                                carver.carve(direction);
+                                board.move(direction);
+                            }
+                        }
+                    } else if (state == GameState.PLAYING) {
+                        board.move(direction);
+                        if(board.hasWon()) {
+                            gameStateContainer.transition(GameState.WON);
+                        }
                     }
-                } catch(InvalidMoveException ime) {
+                    display.notifyMoved();
+                } catch(InvalidMoveException | NotInMazeException ime) {
                     // Just don't move then!
                 }
             }

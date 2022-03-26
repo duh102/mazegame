@@ -120,24 +120,40 @@ public class MazeDisplay {
                     Point2DInt.of(3,3), Point2DInt.of(halfImageWidth, halfImageHeight),
                     Color.BLACK, Color.WHITE);
         } else if(gameState == GameState.EDITING) {
-            drawStringWithBackground("EDITING", drawWith,
-                    Point2DInt.of(3,3), Point2DInt.of(halfImageWidth, halfImageHeight),
-                    null, Color.RED);
+            drawStringWithBackground("EDITING\nCtrl+Move: Carve\nAlt+Move: Seal\nE: Set entrance\nF: Set exit", drawWith,
+                    Point2DInt.of(3,3), Point2DInt.of(60, 50),
+                    Color.WHITE, Color.RED);
         }
         return flipActiveImage();
     }
-    private void drawStringWithBackground(String string, Graphics graphics, Point2DInt padding, Point2DInt center, Color bgColor, Color fgColor) {
+    private void drawStringWithBackground(String sourceStr, Graphics graphics, Point2DInt padding, Point2DInt center, Color bgColor, Color fgColor) {
         FontMetrics fontMetrics = graphics.getFontMetrics();
-        Point2DInt stringSize = Point2DInt.of(fontMetrics.stringWidth(string), fontMetrics.getHeight());
-        Point2DInt halfStringSize = Point2DInt.of(stringSize.getX()/2, stringSize.getY()/2);
-        if(bgColor != null) {
-            graphics.setColor(bgColor);
-            graphics.fillRect(center.getX()-halfStringSize.getX()-padding.getX(),
-                    center.getY()-halfStringSize.getY()-padding.getY(),
-                    stringSize.getX() + padding.getX()*2, stringSize.getY() + padding.getY()*2);
+        String[] strings = sourceStr.split("\n");
+        int maxWidth = 0;
+        for(String string : strings) {
+            maxWidth = Math.max(fontMetrics.stringWidth(string), maxWidth);
         }
+        int halfMaxWidth = maxWidth/2;
+        int lineHeight = fontMetrics.getHeight();
+        int totalHeight = lineHeight*strings.length;
+        int halfTotalHeight = totalHeight/2;
+        if (bgColor != null) {
+            graphics.setColor(bgColor);
+            graphics.fillRect(center.getX() - halfMaxWidth - padding.getX(),
+                    center.getY() - halfTotalHeight - padding.getY(),
+                    maxWidth + padding.getX() * 2,
+                    totalHeight + padding.getY() * 2);
+        }
+        int idx = 0;
         graphics.setColor(fgColor);
-        graphics.drawString(string, center.getX()-halfStringSize.getX(), center.getY()+halfStringSize.getY()-padding.getY());
+        for(String string : strings) {
+            Point2DInt stringSize = Point2DInt.of(fontMetrics.stringWidth(string), lineHeight);
+            Point2DInt halfStringSize = Point2DInt.of(stringSize.getX() / 2, stringSize.getY() / 2);
+            graphics.drawString(string,
+                    center.getX() - halfStringSize.getX(),
+                    center.getY() + stringSize.getY() - padding.getY() + (idx*lineHeight) - halfTotalHeight);
+            idx++;
+        }
     }
 
     public MazeDisplay setIncrementalMovement(double pixelsToMove) {
