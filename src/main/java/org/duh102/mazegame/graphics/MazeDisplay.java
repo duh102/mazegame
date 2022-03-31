@@ -93,20 +93,29 @@ public class MazeDisplay {
                 Tile tileAt = maze.getTileAt(checkLoc);
                 Image tileImage = tm.getTileFor(tileAt, checkLoc.getX(), checkLoc.getY()).getImage();
                 drawWith.drawImage(tileImage, drawOffset.getX(), drawOffset.getY(), null);
+            }
+        }
+        for(int x = 0; x < xTiles; x++) {
+            for (int y = 0; y < yTiles; y++) {
+                Point2DInt checkLoc = Point2DInt.of(charLoc.getX() - (xHalf - x), charLoc.getY() - (yHalf - y));
+                Point2DInt drawOffset = Point2DInt.of(
+                        (int) Math.round(halfImageWidth - ((xHalf - x) * tileSize.getX()) - halfTileX - incrementalCharPosition.getX()),
+                        (int) Math.round(halfImageHeight - ((yHalf - y) * tileSize.getY()) - halfTileY - incrementalCharPosition.getY())
+                );
                 if (checkLoc.equals(entrance)) {
                     ImageWithOffset entImage = tm.getEntranceImage();
                     Point2D.Double entOff = entImage.getOffset();
                     drawWith.drawImage(entImage.getImage(),
-                            (int)Math.round(drawOffset.getX()+halfTileX-entOff.getX()),
-                            (int)Math.round(drawOffset.getY()+halfTileY-entOff.getY()),
+                            (int) Math.round(drawOffset.getX() + halfTileX - entOff.getX()),
+                            (int) Math.round(drawOffset.getY() + halfTileY - entOff.getY()),
                             null);
                 }
                 if (checkLoc.equals(exit)) {
                     ImageWithOffset exImage = tm.getExitImage();
-                    Point2D.Double entOff = exImage.getOffset();
+                    Point2D.Double exOff = exImage.getOffset();
                     drawWith.drawImage(exImage.getImage(),
-                            (int)Math.round(drawOffset.getX()+halfTileX-entOff.getX()),
-                            (int)Math.round(drawOffset.getY()+halfTileY-entOff.getY()),
+                            (int) Math.round(drawOffset.getX() + halfTileX - exOff.getX()),
+                            (int) Math.round(drawOffset.getY() + halfTileY - exOff.getY()),
                             null);
                 }
             }
